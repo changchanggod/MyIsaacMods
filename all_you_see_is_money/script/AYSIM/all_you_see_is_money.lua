@@ -5,10 +5,10 @@ if challengeId == -1 then
     Isaac.ConsoleOutput("[Error]:challenge all_you_see_is_money load failed")
     return nil
 end
+
 local setting=nil
-if mod.Data and mod.Data.AYSIMSetting then
-    setting=mod.Data.AYSIMSetting
-else
+local resetting=false
+local function reset()
     if type(mod.Data)~=table then
         mod.Data={}
     end
@@ -24,7 +24,11 @@ else
     }
     setting=mod.Data.AYSIMSetting
 end
-
+if mod.Data and mod.Data.AYSIMSetting then
+    setting=mod.Data.AYSIMSetting
+else
+    reset()
+end
 
 ---@param EntPick EntityPickup
 local function enlargeTheMoney(_, EntPick)
@@ -51,7 +55,6 @@ local function enlargeTheMoney(_, EntPick)
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, enlargeTheMoney)
-
 local AYSIM_MCM={
     zh = {
         MN = "目尽金银",
@@ -72,6 +75,8 @@ local AYSIM_MCM={
         K6 = "5.20.6实体对应的缩放倍率",
         N7 = "金硬币缩放倍率:",
         K7 = "5.20.7实体对应的缩放倍率",
+        N8 = "重置倍率",
+        K8 = "将所有倍率重置回默认值",
     },
     en = {
         MN = "All You See Is Money",
@@ -92,6 +97,8 @@ local AYSIM_MCM={
         K6 = "Scale for 5.20.6 entity",
         N7 = "Golden Penny Scale:",
         K7 = "Scale for 5.20.7 entity",
+        N8 = "RESET ALL SETTINGS",
+        K8 = "RESET ALL SETTINGS TO DEFAULT",
     }
 }
 local function getMCMDes(key)
@@ -135,7 +142,6 @@ if ModConfigMenu then
             else
                 setting.totalScale=1/(2-n)
             end
-            print("totalScale changed to "..setting.totalScale.." with n="..n)
         end,
         Info = { getMCMDes("K0") }
     })
@@ -341,5 +347,19 @@ if ModConfigMenu then
             end
         end,
         Info = { getMCMDes("K7") }
+    })
+    ModConfigMenu.AddSetting(MN,ST, {
+        Type = ModConfigMenu.OptionType.BOOLEAN,
+        CurrentSetting = function()
+            return resetting
+        end,
+        Display = function()
+            return getMCMDes("N8")
+        end,
+        OnChange = function(boolean)
+            resetting=boolean
+            reset()
+        end,
+        Info = { getMCMDes("K8") }
     })
 end
