@@ -72,6 +72,26 @@ local AYSIM_MCM={
         K6 = "5.20.6实体对应的缩放倍率",
         N7 = "金硬币缩放倍率:",
         K7 = "5.20.7实体对应的缩放倍率",
+    },
+    en = {
+        MN = "All You See Is Money",
+        ST = "Coin Scale Adjustment",
+        N0 = "Total Scale:",
+        K0 = "This scale will be applied to every coin entity, multiplied together",
+        N1 = "Penny Scale:",
+        K1 = "Scale for 5.20.1 entity",
+        N2 = "Nickel Scale:",
+        K2 = "Scale for 5.20.2 entity",
+        N3 = "Dime Scale:",
+        K3 = "Scale for 5.20.3 entity",
+        N4 = "Double Penny Scale:",
+        K4 = "Scale for 5.20.4 entity",
+        N5 = "Lucky Penny Scale:",
+        K5 = "Scale for 5.20.5 entity",
+        N6 = "Sticky Nickel Scale:",
+        K6 = "Scale for 5.20.6 entity",
+        N7 = "Golden Penny Scale:",
+        K7 = "Scale for 5.20.7 entity",
     }
 }
 local function getMCMDes(key)
