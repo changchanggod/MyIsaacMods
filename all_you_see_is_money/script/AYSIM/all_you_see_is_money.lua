@@ -32,7 +32,7 @@ end
 
 ---@param EntPick EntityPickup
 local function enlargeTheMoney(_, EntPick)
-    if Game().Challenge==challengeId then
+    if Game().Challenge==challengeId and setting~=nil then
         if EntPick.Type == EntityType.ENTITY_PICKUP and EntPick.Variant == 20 then
             local scale = 1
             if EntPick.SubType == 1 then
@@ -112,7 +112,7 @@ local function getMCMDes(key)
     end
     return AYSIM_MCM[lan] and AYSIM_MCM[lan][key]
 end
-if ModConfigMenu then
+if ModConfigMenu and setting~=nil then
     local MN=getMCMDes("MN")
     local ST=getMCMDes("ST")
     ModConfigMenu.RemoveSubcategory(MN, ST)
@@ -348,6 +348,7 @@ if ModConfigMenu then
         end,
         Info = { getMCMDes("K7") }
     })
+    ModConfigMenu.AddSpace(MN, ST)
     ModConfigMenu.AddSetting(MN,ST, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
