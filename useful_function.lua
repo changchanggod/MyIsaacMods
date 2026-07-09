@@ -49,3 +49,24 @@ function mod:getPlayerAction(_)
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.getPlayerAction)
+
+------------------------------------------------------------------------------------------------------------
+
+local RECOMMENDED_SHIFT_IDX = 35
+local game = Game()
+local seeds = game:GetSeeds()
+local startSeed = seeds:GetStartSeed()
+local myRNG = RNG()
+myRNG:SetSeed(startSeed, RECOMMENDED_SHIFT_IDX)
+function mod:setMyRNG(isC)
+    if isC then
+        return
+    end
+    game = Game()
+    seeds = game:GetSeeds()
+    startSeed = seeds:GetStartSeed()
+    myRNG:SetSeed(startSeed, RECOMMENDED_SHIFT_IDX)
+end
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.setMyRNG)
+
+------------------------------------------------------------------------------------------------------------
