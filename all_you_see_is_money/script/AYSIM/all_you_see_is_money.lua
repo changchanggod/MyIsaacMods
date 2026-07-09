@@ -5,7 +5,6 @@ if challengeId == -1 then
     Isaac.ConsoleOutput("[Error]:challenge all you see is money load failed")
     return nil
 end
-
 local setting=nil
 local resetting=false
 local function reset()
@@ -29,6 +28,8 @@ if mod.Data and mod.Data.AYSIMSetting then
 else
     reset()
 end
+
+------------------------------- main code -------------------------------
 
 ---@param EntPick EntityPickup
 local function enlargeTheMoney(_, EntPick)
@@ -55,6 +56,45 @@ local function enlargeTheMoney(_, EntPick)
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, enlargeTheMoney)
+
+-------------------------------------------------------------------------
+
+local lastListInd=nil
+local shouldSpawnSecretPath=true
+local function allowSecretPath(_,_,_)
+    if Game().Challenge == challengeId then 
+        local level = Game():GetLevel()
+        local roomDescriptor = level:GetCurrentRoomDesc()
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() and roomDescriptor.ListIndex~=lastListInd then
+            room:TrySpawnSecretExit(true,true)
+            lastListInd=roomDescriptor.ListIndex
+        end
+    end
+end
+local function allowSecretPath2(_)
+    if Game().Challenge == challengeId then 
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() then
+            room:TrySpawnSecretExit(false,true)
+        end
+    end
+end
+local function allowSecretPath3(_)
+    if Game().Challenge == challengeId then 
+        lastListInd=nil
+        local level = Game():GetLevel()
+        local stage=level:GetStage()
+        local stageT=level:GetStageType()
+        shouldSpawnSecretPath=stageT<=2 and stage~=LevelStage.STAGE3_2
+    end
+end
+mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,allowSecretPath2)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)
+
+-------------------------------------------------------------------------
+
 local AYSIM_MCM={
     zh = {
         MN = "CCG挑战合集",
