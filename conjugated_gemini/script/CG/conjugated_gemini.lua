@@ -1,148 +1,160 @@
-local mod= CCGChallenges45768
-local rLeft=false
-local rRight=false
-local rUp=false
-local rDown=false
-local rShootLeft=false
-local rShootRight=false
-local rShootUp=false
-local rShootDown=false
+local mod = CCGChallenges45768
+local challengeId = Isaac.GetChallengeIdByName("conjugated gemini")
+if challengeId == -1 then
+    Isaac.ConsoleOutput('[CCG][Error]:challenge "conjugated gemini" load failed')
+    return nil
+end
+
+local rLeft = false
+local rRight = false
+local rUp = false
+local rDown = false
+local rShootLeft = false
+local rShootRight = false
+local rShootUp = false
+local rShootDown = false
 function mod:getPlayerAction(_)
-    if Input.IsActionPressed(ButtonAction.ACTION_LEFT, 0) then
-        rShootLeft=true
-    else
-        rShootLeft=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_RIGHT, 0) then
-        rShootRight=true
-    else 
-        rShootRight=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_UP, 0) then
-        rShootUp=true
-    else 
-        rShootUp=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_DOWN, 0) then
-        rShootDown=true
-    else 
-        rShootDown=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_SHOOTLEFT, 0) then
-        rLeft=true
-    else 
-        rLeft=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_SHOOTRIGHT, 0) then
-        rRight=true
-    else 
-        rRight=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_SHOOTUP, 0) then
-        rUp=true
-    else 
-        rUp=false
-    end
-    if Input.IsActionPressed(ButtonAction.ACTION_SHOOTDOWN, 0) then
-        rDown=true
-    else 
-        rDown=false
+    if Game().Challenge == challengeId then
+        if Input.IsActionPressed(ButtonAction.ACTION_LEFT, 0) then
+            rShootLeft = true
+        else
+            rShootLeft = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_RIGHT, 0) then
+            rShootRight = true
+        else
+            rShootRight = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_UP, 0) then
+            rShootUp = true
+        else
+            rShootUp = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_DOWN, 0) then
+            rShootDown = true
+        else
+            rShootDown = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_SHOOTLEFT, 0) then
+            rLeft = true
+        else
+            rLeft = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_SHOOTRIGHT, 0) then
+            rRight = true
+        else
+            rRight = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_SHOOTUP, 0) then
+            rUp = true
+        else
+            rUp = false
+        end
+        if Input.IsActionPressed(ButtonAction.ACTION_SHOOTDOWN, 0) then
+            rDown = true
+        else
+            rDown = false
+        end
     end
 end
+
 function mod:JudgePlayerAction(Ent, InputH, ButtonA)
     if Ent == nil then
         return nil
     end
-    if Ent:ToPlayer():GetPlayerType() == PlayerType.PLAYER_ESAU then
-        if InputH == InputHook.IS_ACTION_PRESSED then
-            if ButtonA==ButtonAction.ACTION_SHOOTLEFT then
-                if rShootLeft then
-                    return true
-                else 
-                    return false
+    if Game().Challenge == challengeId then
+        if Ent:ToPlayer():GetPlayerType() == PlayerType.PLAYER_ESAU then
+            if InputH == InputHook.IS_ACTION_PRESSED then
+                if ButtonA == ButtonAction.ACTION_SHOOTLEFT then
+                    if rShootLeft then
+                        return true
+                    else
+                        return false
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTRIGHT then
-                if rShootRight then
-                    return true
-                else 
-                    return false
+                if ButtonA == ButtonAction.ACTION_SHOOTRIGHT then
+                    if rShootRight then
+                        return true
+                    else
+                        return false
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTUP then
-                if rShootUp then
-                    return true
-                else 
-                    return false
+                if ButtonA == ButtonAction.ACTION_SHOOTUP then
+                    if rShootUp then
+                        return true
+                    else
+                        return false
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTDOWN then
-                if rShootDown then
-                    return true
-                else 
-                    return false
+                if ButtonA == ButtonAction.ACTION_SHOOTDOWN then
+                    if rShootDown then
+                        return true
+                    else
+                        return false
+                    end
                 end
-            end
-        elseif InputH==InputHook.GET_ACTION_VALUE then
-            if ButtonA==ButtonAction.ACTION_LEFT then
-                if rLeft then
-                    return 1.0
-                else
-                    return 0
+            elseif InputH == InputHook.GET_ACTION_VALUE then
+                if ButtonA == ButtonAction.ACTION_LEFT then
+                    if rLeft then
+                        return 1.0
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_RIGHT then
-                if rRight then
-                    return 1.0
-                else
-                    return 0
+                if ButtonA == ButtonAction.ACTION_RIGHT then
+                    if rRight then
+                        return 1.0
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_UP then
-                if rUp then
-                    return 1.0
-                else
-                    return 0
+                if ButtonA == ButtonAction.ACTION_UP then
+                    if rUp then
+                        return 1.0
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_DOWN then
-                if rDown then
-                    return 1.0
-                else
-                    return 0
+                if ButtonA == ButtonAction.ACTION_DOWN then
+                    if rDown then
+                        return 1.0
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTLEFT then
-                if rShootLeft then
-                    return 1
-                else 
-                    return 0
+                if ButtonA == ButtonAction.ACTION_SHOOTLEFT then
+                    if rShootLeft then
+                        return 1
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTRIGHT then
-                if rShootRight then
-                    return 1
-                else 
-                    return 0
+                if ButtonA == ButtonAction.ACTION_SHOOTRIGHT then
+                    if rShootRight then
+                        return 1
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTUP then
-                if rShootUp then
-                    return 1
-                else 
-                    return 0
+                if ButtonA == ButtonAction.ACTION_SHOOTUP then
+                    if rShootUp then
+                        return 1
+                    else
+                        return 0
+                    end
                 end
-            end
-            if ButtonA==ButtonAction.ACTION_SHOOTDOWN then
-                if rShootDown then
-                    return 1
-                else 
-                    return 0
+                if ButtonA == ButtonAction.ACTION_SHOOTDOWN then
+                    if rShootDown then
+                        return 1
+                    else
+                        return 0
+                    end
                 end
             end
         end
+        return nil
     end
-    return nil
 end
+
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.getPlayerAction)
 mod:AddCallback(ModCallbacks.MC_INPUT_ACTION, mod.JudgePlayerAction)

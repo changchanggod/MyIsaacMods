@@ -1,0 +1,10 @@
+<challenges version="1">
+    <challenge
+        playertype="19"
+        achievements="{405,78,34}"
+        difficulty="0"
+        endstage="11"
+        name="conjugated gemini"
+        secretpath="true"
+    />
+</challenges>
