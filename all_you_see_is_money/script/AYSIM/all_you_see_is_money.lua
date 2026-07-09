@@ -86,7 +86,7 @@ local function allowSecretPath3(_)
         local level = Game():GetLevel()
         local stage=level:GetStage()
         local stageT=level:GetStageType()
-        shouldSpawnSecretPath=stageT<=2 and stage~=LevelStage.STAGE3_2
+        shouldSpawnSecretPath=stageT<=2 or stage==LevelStage.STAGE2_2 or stage==LevelStage.STAGE1_2
     end
 end
 mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
