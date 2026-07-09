@@ -1,4 +1,4 @@
-local mod = RegisterMod("Conjugated Gemini", 1)
+local mod= CCGChallenges45768
 local rLeft=false
 local rRight=false
 local rUp=false
