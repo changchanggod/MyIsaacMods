@@ -13,7 +13,7 @@ local rShootLeft = false
 local rShootRight = false
 local rShootUp = false
 local rShootDown = false
-function mod:getPlayerAction(_)
+local function getPlayerAction(_,_)
     if Game().Challenge == challengeId then
         if Input.IsActionPressed(ButtonAction.ACTION_LEFT, 0) then
             rShootLeft = true
@@ -58,7 +58,7 @@ function mod:getPlayerAction(_)
     end
 end
 
-function mod:JudgePlayerAction(Ent, InputH, ButtonA)
+local function JudgePlayerAction(_,Ent, InputH, ButtonA)
     if Ent == nil then
         return nil
     end
@@ -156,5 +156,43 @@ function mod:JudgePlayerAction(Ent, InputH, ButtonA)
     end
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.getPlayerAction)
-mod:AddCallback(ModCallbacks.MC_INPUT_ACTION, mod.JudgePlayerAction)
+mod:AddCallback(ModCallbacks.MC_POST_RENDER,getPlayerAction)
+mod:AddCallback(ModCallbacks.MC_INPUT_ACTION, JudgePlayerAction)
+
+local lastListInd=nil
+local shouldSpawnSecretPath=true
+local function allowSecretPath(_,_,pos)
+    if Game().Challenge == challengeId then 
+        print(pos)
+        local level = Game():GetLevel()
+        local roomDescriptor = level:GetCurrentRoomDesc()
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() and roomDescriptor.ListIndex~=lastListInd then
+            room:TrySpawnSecretExit(true,true)
+            lastListInd=roomDescriptor.ListIndex
+        end
+    end
+end
+local function allowSecretPath2(_)
+    if Game().Challenge == challengeId then 
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() then
+            room:TrySpawnSecretExit(false,true)
+        end
+    end
+end
+local function allowSecretPath3(_)
+    if Game().Challenge == challengeId then 
+        lastListInd=nil
+        local level = Game():GetLevel()
+        local stage=level:GetStage()
+        local stageT=level:GetStageType()
+        shouldSpawnSecretPath=stageT<=2 and stage~=LevelStage.STAGE3_2
+    end
+end
+mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,allowSecretPath2)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)
+--l local room=Game():GetRoom() room:TrySpawnSecretExit(true)
+--l local room=Game():GetRoom() print(room:IsCurrentRoomLastBoss ())
+--l Game():Spawn(5,20,Vector(350,280),Vector.Zero,1,123)

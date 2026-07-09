@@ -13,3 +13,4 @@ if CCGChallenges45768==nil then
     end
     mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.saveMyData)
 end
+include("script.CG.conjugated_gemini")
