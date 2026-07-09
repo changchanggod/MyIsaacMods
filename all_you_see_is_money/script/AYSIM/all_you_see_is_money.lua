@@ -1,8 +1,8 @@
 local mod= CCGChallenges45768
 ---@type number
-local challengeId = Isaac.GetChallengeIdByName("all_you_see_is_money")
+local challengeId = Isaac.GetChallengeIdByName("all you see is money")
 if challengeId == -1 then
-    Isaac.ConsoleOutput("[Error]:challenge all_you_see_is_money load failed")
+    Isaac.ConsoleOutput("[Error]:challenge all you see is money load failed")
     return nil
 end
 
@@ -57,8 +57,10 @@ end
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, enlargeTheMoney)
 local AYSIM_MCM={
     zh = {
-        MN = "目尽金银",
-        ST = "硬币缩放倍率调整",
+        MN = "CCG挑战合集",
+        ST = "目尽金银",
+        T0 = "对应挑战：All You See Is Money",
+        T1 = "硬币缩放倍率调整",
         N0 = "总缩放倍率:",
         K0 = "该缩放倍率将作用于每一个硬币实体，乘算叠加",
         N1 = "硬币缩放倍率:",
@@ -79,8 +81,10 @@ local AYSIM_MCM={
         K8 = "将所有倍率重置回默认值",
     },
     en = {
-        MN = "All You See Is Money",
-        ST = "Coin Scale Adjustment",
+        MN = "CCG Challenge Collection",
+        ST = "All You See Is Money",
+        -- T0 = nil
+        T1 = "Coin Scale Adjustment",
         N0 = "Total Scale:",
         K0 = "This scale will be applied to every coin entity, multiplied together",
         N1 = "Penny Scale:",
@@ -116,6 +120,11 @@ if ModConfigMenu and setting~=nil then
     local MN=getMCMDes("MN")
     local ST=getMCMDes("ST")
     ModConfigMenu.RemoveSubcategory(MN, ST)
+    if getMCMDes("T0") then
+        ModConfigMenu.AddTitle(MN, ST, getMCMDes("T0"))
+        ModConfigMenu.AddSpace(MN, ST)
+    end
+    ModConfigMenu.AddTitle(MN, ST, getMCMDes("T1"))
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
         CurrentSetting = function()
