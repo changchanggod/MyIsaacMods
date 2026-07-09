@@ -12,6 +12,7 @@ local force_pos=Vector.Zero
 local Ent_Ptr=nil
 local motion_V=8
 local last_dir=Vector.Zero
+local last_return_dir=nil
 
 local rShootLeft=false
 local rShootRight=false
@@ -56,20 +57,36 @@ local function judgePlayerAction(_,Ent)
             player.Friction=origin_Friction_P        
             relative_motion=false
         end
-        if Ent_Ptr~=nil and Ent_Ptr.Ref~=nil and (rShootDown or rShootLeft or rShootRight or rShootUp ) then
+        if Ent_Ptr~=nil and Ent_Ptr.Ref~=nil then
             local dir=Ent_Ptr.Ref.Position-player.Position
+            dir:Normalize()
             local acceleration=0
             local dis=Ent_Ptr.Ref.Position:Distance(player.Position)
-            dir:Normalize()
-            if dis>170 then
-                acceleration=(dis-170)*0.1
-            elseif dis<170 then
-                acceleration=(dis-170)*0.1
-            end
-            Ent_Ptr.Ref.Velocity=Vector.Zero
-            Ent_Ptr.Ref.Position=force_pos
-            if acceleration~=0 then
-                player.Velocity=player.Velocity+acceleration*dir
+            if rShootDown or rShootLeft or rShootRight or rShootUp then
+                if dis>170 then
+                    acceleration=(dis-170)*0.1
+                elseif dis<170 then
+                    acceleration=(dis-170)*0.1
+                end
+                Ent_Ptr.Ref.Velocity=Vector.Zero
+                Ent_Ptr.Ref.Position=force_pos
+                if acceleration~=0 then
+                    player.Velocity=player.Velocity+acceleration*dir
+                end
+            else
+                acceleration=dis*0.1
+                Ent_Ptr.Ref.Velocity=Vector.Zero
+                Ent_Ptr.Ref.Position=force_pos
+                if dis<10 or (last_return_dir and math.abs(last_return_dir:GetAngleDegrees()-dir:GetAngleDegrees())>=90) then
+                    player.Velocity=player.Velocity:Normalized()/10
+                    player.Position=force_pos
+                else
+                    player.Velocity=player.Velocity+acceleration*dir
+                end
+                last_return_dir=dir
+                if dis<1 then
+                    Ent_Ptr.Ref:Remove()
+                end
             end
         end
     end
@@ -89,6 +106,7 @@ local function relative_motionF(_,Ent)
             Ent.Velocity=Vector.Zero
             force_pos=player.Position
             relative_motion=true
+            last_return_dir=nil
             Ent_Ptr=EntityPtr(Ent)
             if Input.IsActionPressed(ButtonAction.ACTION_SHOOTUP, 0) then
                 player.Velocity=Vector(player.Velocity.X,motion_V)
