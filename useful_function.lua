@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local rLeft=false
 local rRight=false
 local rUp=false
