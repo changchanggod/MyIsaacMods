@@ -148,3 +148,39 @@ local function resetForcePos(_)
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,resetForcePos)
+
+------------------------------------------------------------------------------------------------------------
+
+local lastListInd=nil
+local shouldSpawnSecretPath=true
+local function allowSecretPath(_,_,_)
+    if Game().Challenge == challengeId then 
+        local level = Game():GetLevel()
+        local roomDescriptor = level:GetCurrentRoomDesc()
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() and roomDescriptor.ListIndex~=lastListInd then
+            room:TrySpawnSecretExit(true,true)
+            lastListInd=roomDescriptor.ListIndex
+        end
+    end
+end
+local function allowSecretPath2(_)
+    if Game().Challenge == challengeId then 
+        local room=Game():GetRoom()
+        if shouldSpawnSecretPath and room:IsCurrentRoomLastBoss() and room:IsClear() then
+            room:TrySpawnSecretExit(false,true)
+        end
+    end
+end
+local function allowSecretPath3(_)
+    if Game().Challenge == challengeId then 
+        lastListInd=nil
+        local level = Game():GetLevel()
+        local stage=level:GetStage()
+        local stageT=level:GetStageType()
+        shouldSpawnSecretPath=stageT<=2 or stage==LevelStage.STAGE2_2 or stage==LevelStage.STAGE1_2
+    end
+end
+mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,allowSecretPath2)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)
