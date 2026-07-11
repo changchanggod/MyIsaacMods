@@ -105,7 +105,7 @@ local function allowSecretPath3(_)
 end
 mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,allowSecretPath2)
-mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)\
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)
 
 -------------------------------------------------------------------------------------------------------------
 

@@ -20,4 +20,12 @@
         endstage="11"
         name="turn the tables"
     />
+    <challenge
+        playertype="40"
+        achievements="{488,78,34}"
+        difficulty="0"
+        endstage="11"
+        name="don't pick up shit"
+        altpath="true"
+    />
 </challenges>
