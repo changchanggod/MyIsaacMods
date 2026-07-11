@@ -35,7 +35,7 @@ local game = Game()
 local seeds = game:GetSeeds()
 local startSeed = seeds:GetStartSeed()
 local myRNG = RNG()
-myRNG:SetSeed(startSeed, RECOMMENDED_SHIFT_IDX)
+myRNG:SetSeed(math.max(1,startSeed), RECOMMENDED_SHIFT_IDX)
 function mod:setMyRNG(isC)
     if isC then
         return
