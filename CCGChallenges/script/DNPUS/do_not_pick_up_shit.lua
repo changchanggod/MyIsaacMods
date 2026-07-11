@@ -28,8 +28,6 @@ if mod.Data and mod.Data.DNPUSSetting then
 else
     reset()
 end
-
-utils.allowChallengeSecretPath(challengeId, false)
 local function spawnShit(num)
     local game = Game()
     if game.Challenge == challengeId then
