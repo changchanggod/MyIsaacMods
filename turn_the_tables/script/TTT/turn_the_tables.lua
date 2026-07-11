@@ -2,7 +2,7 @@ local mod = CCGChallenges45768
 ---@type number
 local challengeId = Isaac.GetChallengeIdByName("turn the tables")
 if challengeId == -1 then
-    Isaac.ConsoleOutput('[Error]:challenge "turn the tables" load failed')
+    Isaac.ConsoleOutput('[CCG][Error]:challenge "turn the tables" load failed')
     return nil
 end
 
