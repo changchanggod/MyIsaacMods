@@ -9,7 +9,7 @@ utils.allowChallengeSecretPath(challengeId,false)
 local setting=nil
 local resetting=false
 local function reset()
-    if type(mod.Data)~=table then
+    if type(mod.Data)~="table" then
         mod.Data={}
     end
     mod.Data.AYSIMSetting={
@@ -114,7 +114,7 @@ if ModConfigMenu and setting~=nil then
     local MN=utils.getMCMDes(AYSIM_MCM, "MN")
     local ST=utils.getMCMDes(AYSIM_MCM, "ST")
     ModConfigMenu.RemoveSubcategory(MN, ST)
-    if utils.getMCMDes("T0") then
+    if utils.getMCMDes(AYSIM_MCM,"T0") then
         ModConfigMenu.AddTitle(MN, ST, utils.getMCMDes(AYSIM_MCM, "T0"))
         ModConfigMenu.AddSpace(MN, ST)
     end

@@ -17,7 +17,7 @@ function Utils.GetItemSafe(itemName)
     return tId
 end
 
-local function getMCMDes(MCM,key)
+function Utils.getMCMDes(MCM,key)
     local lan = Options.Language
     lan = MCM[lan] and lan or "en"
     local zhMCM = ModConfigMenu.i18n == "Chinese"
