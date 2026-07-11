@@ -1,10 +1,18 @@
 local mod= CCGChallenges45768
 
-local CHALLENGE_NAME = "don't pick up shit"
----@type number
-local challengeId = Isaac.GetChallengeIdByName(CHALLENGE_NAME)
+local function GetChallengeSafe(challengeName)
+    local cId = Isaac.GetChallengeIdByName(challengeName)
+    if cId == -1 then
+        Isaac.ConsoleOutput(string.format("[CCG][Error]: Challenge \"%s\" load failed, missing challenge\n", challengeName))
+        return nil
+    end
+    return cId
+end
 
-if challengeId == -1 then
-    Isaac.ConsoleOutput(string.format("[CCG][Error]: Challenge \"%s\" load failed, missing challenge\n", CHALLENGE_NAME))
-    return nil
+local challengeId=GetChallengeSafe()
+
+local function spawnShit(num)
+    for i = 1, 10, 1 do
+        
+    end
 end
