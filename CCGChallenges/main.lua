@@ -1,5 +1,5 @@
 
-CCGChallenges45768 =CCGChallenges45768 or RegisterMod("all you see is money", 1)
+CCGChallenges45768 =RegisterMod("CCG Challenges", 1)
 local mod= CCGChallenges45768
 local json=require("json")
 if mod:HasData() then
