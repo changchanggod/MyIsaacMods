@@ -1,0 +1,4 @@
+<items gfxroot="gfx/items/" version="1">
+    <passive id="32026711" name="bad shit" gfx="bad_shit.png" description="shit is not a good thing"
+        quality="0" hidden="true" craftquality="-1" />
+</items>
