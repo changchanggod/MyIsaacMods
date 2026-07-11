@@ -17,6 +17,18 @@ function Utils.GetItemSafe(itemName)
     return tId
 end
 
+local function getMCMDes(MCM,key)
+    local lan = Options.Language
+    lan = MCM[lan] and lan or "en"
+    local zhMCM = ModConfigMenu.i18n == "Chinese"
+    if zhMCM and lan ~= "zh" then
+        lan = "zh"
+    elseif not (zhMCM) and lan == "zh" then
+        lan = "en"
+    end
+    return MCM[lan] and MCM[lan][key]
+end
+
 local ChallengesSP={}
 function Utils.allowChallengeSecretPath(cId,isEnd13)
     ChallengesSP[cId]=isEnd13

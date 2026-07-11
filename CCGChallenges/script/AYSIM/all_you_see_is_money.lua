@@ -110,26 +110,15 @@ local AYSIM_MCM={
         K8 = "RESET ALL SETTINGS TO DEFAULT",
     }
 }
-local function getMCMDes(key)
-    local lan = Options.Language
-    lan = AYSIM_MCM[lan] and lan or "en"
-    local zhMCM = ModConfigMenu.i18n == "Chinese"
-    if zhMCM and lan ~= "zh" then
-        lan = "zh"
-    elseif not (zhMCM) and lan == "zh" then
-        lan = "en"
-    end
-    return AYSIM_MCM[lan] and AYSIM_MCM[lan][key]
-end
 if ModConfigMenu and setting~=nil then
-    local MN=getMCMDes("MN")
-    local ST=getMCMDes("ST")
+    local MN=utils.getMCMDes(AYSIM_MCM, "MN")
+    local ST=utils.getMCMDes(AYSIM_MCM, "ST")
     ModConfigMenu.RemoveSubcategory(MN, ST)
-    if getMCMDes("T0") then
-        ModConfigMenu.AddTitle(MN, ST, getMCMDes("T0"))
+    if utils.getMCMDes("T0") then
+        ModConfigMenu.AddTitle(MN, ST, utils.getMCMDes(AYSIM_MCM, "T0"))
         ModConfigMenu.AddSpace(MN, ST)
     end
-    ModConfigMenu.AddTitle(MN, ST, getMCMDes("T1"))
+    ModConfigMenu.AddTitle(MN, ST, utils.getMCMDes(AYSIM_MCM, "T1"))
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
         CurrentSetting = function()
@@ -143,10 +132,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 10,
         Display = function()
             if setting.totalScale>=1 then
-                return getMCMDes("N0") ..
+                return utils.getMCMDes(AYSIM_MCM, "N0") ..
                     string.format("1 X %d", setting.totalScale)
             else
-                return getMCMDes("N0") ..
+                return utils.getMCMDes(AYSIM_MCM, "N0") ..
                     string.format("1 / %d", 1/setting.totalScale)
             end
         end,
@@ -157,7 +146,7 @@ if ModConfigMenu and setting~=nil then
                 setting.totalScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K0") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K0") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -172,10 +161,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.PennyScale>=1 then
-                return getMCMDes("N1") ..
+                return utils.getMCMDes(AYSIM_MCM, "N1") ..
                     string.format("1 X %d",setting.PennyScale)
             else
-                return getMCMDes("N1") ..
+                return utils.getMCMDes(AYSIM_MCM, "N1") ..
                     string.format("1 / %d",1/setting.PennyScale)
             end
         end,
@@ -186,7 +175,7 @@ if ModConfigMenu and setting~=nil then
                 setting.PennyScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K1") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K1") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -201,10 +190,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.NickelScale>=1 then
-                return getMCMDes("N2") ..
+                return utils.getMCMDes(AYSIM_MCM, "N2") ..
                     string.format("1 X %d", setting.NickelScale)
             else
-                return getMCMDes("N2") ..
+                return utils.getMCMDes(AYSIM_MCM, "N2") ..
                     string.format("1 / %d", 1/setting.NickelScale)
             end
         end,
@@ -215,7 +204,7 @@ if ModConfigMenu and setting~=nil then
                 setting.NickelScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K2") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K2") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -230,10 +219,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.DimeScale>=1 then
-                return getMCMDes("N3") ..
+                return utils.getMCMDes(AYSIM_MCM, "N3") ..
                     string.format("1 X %d", setting.DimeScale)
             else
-                return getMCMDes("N3") ..
+                return utils.getMCMDes(AYSIM_MCM, "N3") ..
                     string.format("1 / %d", 1/setting.DimeScale)
             end
         end,
@@ -244,7 +233,7 @@ if ModConfigMenu and setting~=nil then
                 setting.DimeScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K3") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K3") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -259,10 +248,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.DoublePennyScale>=1 then
-                return getMCMDes("N4") ..
+                return utils.getMCMDes(AYSIM_MCM, "N4") ..
                     string.format("1 X %d", setting.DoublePennyScale)
             else
-                return getMCMDes("N4") ..
+                return utils.getMCMDes(AYSIM_MCM, "N4") ..
                     string.format("1 / %d", 1/setting.DoublePennyScale)
             end
         end,
@@ -273,7 +262,7 @@ if ModConfigMenu and setting~=nil then
                 setting.DoublePennyScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K4") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K4") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -288,10 +277,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.LuckyPennyScale>=1 then
-                return getMCMDes("N5") ..
+                return utils.getMCMDes(AYSIM_MCM, "N5") ..
                     string.format("1 X %d", setting.LuckyPennyScale)
             else
-                return getMCMDes("N5") ..
+                return utils.getMCMDes(AYSIM_MCM, "N5") ..
                     string.format("1 / %d", 1/setting.LuckyPennyScale)
             end
         end,
@@ -302,7 +291,7 @@ if ModConfigMenu and setting~=nil then
                 setting.LuckyPennyScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K5") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K5") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -317,10 +306,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.StickyNickelScale>=1 then
-                return getMCMDes("N6") ..
+                return utils.getMCMDes(AYSIM_MCM, "N6") ..
                     string.format("1 X %d", setting.StickyNickelScale)
             else
-                return getMCMDes("N6") ..
+                return utils.getMCMDes(AYSIM_MCM, "N6") ..
                     string.format("1 / %d", 1/setting.StickyNickelScale)
             end
         end,
@@ -331,7 +320,7 @@ if ModConfigMenu and setting~=nil then
                 setting.StickyNickelScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K6") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K6") }
     })
     ModConfigMenu.AddSetting(MN, ST, {
         Type = ModConfigMenu.OptionType.NUMBER,
@@ -346,10 +335,10 @@ if ModConfigMenu and setting~=nil then
         Maximum = 20,
         Display = function()
             if setting.GoldenPennyScale>=1 then
-                return getMCMDes("N7") ..
+                return utils.getMCMDes(AYSIM_MCM, "N7") ..
                     string.format("1 X %d", setting.GoldenPennyScale)
             else
-                return getMCMDes("N7") ..
+                return utils.getMCMDes(AYSIM_MCM, "N7") ..
                     string.format("1 / %d", 1/setting.GoldenPennyScale)
             end
         end,
@@ -360,7 +349,7 @@ if ModConfigMenu and setting~=nil then
                 setting.GoldenPennyScale=1/(2-n)
             end
         end,
-        Info = { getMCMDes("K7") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K7") }
     })
     ModConfigMenu.AddSpace(MN, ST)
     ModConfigMenu.AddSetting(MN,ST, {
@@ -369,13 +358,13 @@ if ModConfigMenu and setting~=nil then
             return resetting
         end,
         Display = function()
-            return getMCMDes("N8")
+            return utils.getMCMDes(AYSIM_MCM, "N8")
         end,
         OnChange = function(boolean)
             resetting=boolean
             reset()
         end,
-        Info = { getMCMDes("K8") }
+        Info = { utils.getMCMDes(AYSIM_MCM, "K8") }
     })
 end
 
