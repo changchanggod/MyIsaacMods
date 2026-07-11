@@ -29,6 +29,29 @@ function Utils.getMCMDes(MCM,key)
     return MCM[lan] and MCM[lan][key]
 end
 
+
+local RECOMMENDED_SHIFT_IDX = 35
+local game = Game()
+local seeds = game:GetSeeds()
+local startSeed = seeds:GetStartSeed()
+local myRNG = RNG()
+myRNG:SetSeed(startSeed, RECOMMENDED_SHIFT_IDX)
+function mod:setMyRNG(isC)
+    if isC then
+        return
+    end
+    game = Game()
+    seeds = game:GetSeeds()
+    startSeed = seeds:GetStartSeed()
+    myRNG:SetSeed(startSeed, RECOMMENDED_SHIFT_IDX)
+end
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.setMyRNG)
+function Utils.getRNG()
+    return myRNG
+end
+
+
+
 local ChallengesSP={}
 function Utils.allowChallengeSecretPath(cId,isEnd13)
     ChallengesSP[cId]=isEnd13

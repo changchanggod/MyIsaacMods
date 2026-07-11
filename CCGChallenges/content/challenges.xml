@@ -28,4 +28,11 @@
         name="don't pick up shit"
         altpath="true"
     />
+    <challenge
+        playertype="22"
+        achievements="{475,78,34}"
+        difficulty="0"
+        endstage="11"
+        name="blue or white"
+    />
 </challenges>
