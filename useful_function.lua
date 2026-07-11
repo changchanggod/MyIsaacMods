@@ -105,4 +105,15 @@ local function allowSecretPath3(_)
 end
 mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,allowSecretPath)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,allowSecretPath2)
-mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,allowSecretPath3)\
+
+-------------------------------------------------------------------------------------------------------------
+
+local CHALLENGE_NAME = "don't pick up shit"
+---@type number
+local challengeId = Isaac.GetChallengeIdByName(CHALLENGE_NAME)
+
+if challengeId == -1 then
+    Isaac.ConsoleOutput(string.format("[CCG][Error]: Challenge \"%s\" load failed, missing challenge\n", CHALLENGE_NAME))
+    return nil
+end
