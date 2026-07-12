@@ -1,36 +1,37 @@
 <challenges version="1">
     <challenge
         playertype="33"
-        achievements="{486,78,34}"
+        achievements="486,78,34"
         difficulty="0"
         endstage="11"
         name="all you see is money"
     />
     <challenge
         playertype="19"
-        achievements="{405,78,34}"
+        achievements="405,78,34"
         difficulty="0"
         endstage="11"
         name="conjugated gemini"
     />
     <challenge
         playertype="32"
-        achievements="{485,78,34}"
+        achievements="485,78,34"
         difficulty="0"
         endstage="11"
         name="turn the tables"
     />
     <challenge
         playertype="35"
-        achievements="{488,78,34}"
+        achievements="488,78,34"
         difficulty="0"
         endstage="11"
+        startingtrinkets="88"
         name="don't pick up shit"
         altpath="true"
     />
     <challenge
         playertype="22"
-        achievements="{475,78,34}"
+        achievements="475,78,34"
         difficulty="0"
         endstage="11"
         name="blue or white"
