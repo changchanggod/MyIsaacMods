@@ -7,6 +7,8 @@
         "DNPUS",
         "endstage",
         "MCMDes",
+        "NOANIM",
+        "PILLEFFECT",
         "playertype",
         "ROOMSHAPE",
         "secretpath",
