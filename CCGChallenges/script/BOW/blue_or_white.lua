@@ -24,7 +24,7 @@ else
     reset()
 end
 
-function mod:try(EntP)
+function mod:blue_or_white(EntP)
     if Game().Challenge==challengeId and setting then
         if  EntP.Timeout>0
         and EntP.FrameCount==0
@@ -41,8 +41,8 @@ function mod:try(EntP)
         end 
     end
 end
-mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, mod.try,PickupVariant.PICKUP_HEART)
-
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, mod.blue_or_white,PickupVariant.PICKUP_HEART)
+utils.addTrinket(challengeId,TrinketType.TRINKET_KEEPERS_BARGAIN | TrinketType.TRINKET_GOLDEN_FLAG)
 
 ---------------------------------------------------------------------
 local BOW_MCM = {
