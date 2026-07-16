@@ -35,4 +35,10 @@
         endstage="11"
         name="blue or white"
     />
+    <challenge
+        playertype="0"
+        difficulty="2"
+        endstage="7"
+        name="ultra hard greed"
+    />
 </challenges>

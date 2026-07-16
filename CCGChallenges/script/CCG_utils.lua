@@ -17,6 +17,24 @@ function Utils.GetItemSafe(itemName)
     return tId
 end
 
+local MASK = 0x3FF      -- 10bit 掩码 (0~1023，适配上限1000)
+local SHIFT_VAR = 10
+local SHIFT_SUB = 20
+
+function Utils.TypeToNum(Type, Var, SubType)
+    Type = Type & MASK
+    Var  = Var  & MASK
+    SubType = SubType & MASK
+    return (Type << SHIFT_SUB) | (SubType << SHIFT_VAR) | Var
+end
+
+function Utils.NumToType(hash)
+    local Var     = hash & MASK
+    local SubType = (hash >> SHIFT_VAR) & MASK
+    local Type    = (hash >> SHIFT_SUB) & MASK
+    return Type, Var, SubType
+end
+
 function Utils.getMCMDes(MCM,key)
     local lan = Options.Language
     lan = MCM[lan] and lan or "en"
