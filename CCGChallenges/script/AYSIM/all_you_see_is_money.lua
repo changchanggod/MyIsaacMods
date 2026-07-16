@@ -1,7 +1,8 @@
 local mod= CCGChallenges45768
 local utils = require("script.CCG_utils")
+local challengeName="all you see is money"
 ---@type number|nil
-local challengeId = utils.GetChallengeSafe("all you see is money")
+local challengeId = utils.GetChallengeSafe(challengeName)
 if challengeId==nil then
     return
 end
@@ -64,7 +65,7 @@ local AYSIM_MCM={
     zh = {
         MN = "CCG挑战合集",
         ST = "目尽金银",
-        T0 = "对应挑战：All You See Is Money",
+        T0 = "对应挑战："..challengeName,
         T1 = "硬币缩放倍率调整",
         N0 = "总缩放倍率:",
         K0 = "该缩放倍率将作用于每一个硬币实体，乘算叠加",
@@ -87,7 +88,7 @@ local AYSIM_MCM={
     },
     en = {
         MN = "CCG Challenge Collection",
-        ST = "All You See Is Money",
+        ST = challengeName,
         -- T0 = nil
         T1 = "Coin Scale Adjustment",
         N0 = "Total Scale:",

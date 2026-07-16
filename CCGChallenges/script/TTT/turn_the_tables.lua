@@ -1,7 +1,8 @@
 local mod = CCGChallenges45768
 local utils=require("script.CCG_utils")
+local challengeName="turn the tables"
 ---@type number|nil
-local challengeId = utils.GetChallengeSafe("turn the tables")
+local challengeId = utils.GetChallengeSafe(challengeName)
 if challengeId == nil then
     return nil
 end

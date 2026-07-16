@@ -1,7 +1,8 @@
 local mod = CCGChallenges45768
 local utils = require("script.CCG_utils")
+local challengeName="don't pick up shit"
 ---@type integer|nil
-local challengeId = utils.GetChallengeSafe("don't pick up shit")
+local challengeId = utils.GetChallengeSafe(challengeName)
 ---@type integer|nil
 local shitId = utils.GetItemSafe("bad shit")
 if challengeId == nil or shitId == nil then
@@ -95,7 +96,7 @@ local DNPUS_MCM = {
     zh = {
         MN = "CCG挑战合集",
         ST = "不要搬史",
-        T0 = "对应挑战：don't pick up shit",
+        T0 = "对应挑战："..challengeName,
         T1 = "史数量调整",
         N0 = "目前史量:",
         K0 = "在每一个正常大小的未清理房间生成的史数量",
@@ -108,7 +109,7 @@ local DNPUS_MCM = {
     },
     en = {
         MN = "CCG Challenge Collection",
-        ST = "Don't Pick Up Shit",
+        ST = challengeName,
         --T0 = nil
         T1 = "Shit Count Adjustment",
         N0 = "Current shit Count:",

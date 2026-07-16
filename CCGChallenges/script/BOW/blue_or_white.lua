@@ -1,6 +1,7 @@
 local mod=CCGChallenges45768
 local utils=require("script.CCG_utils")
-local challengeId=utils.GetChallengeSafe("blue or white")
+local challengeName="blue or white"
+local challengeId=utils.GetChallengeSafe(challengeName)
 local myRNG=utils.getRNG()
 if not challengeId then
     return nil
@@ -49,7 +50,7 @@ local BOW_MCM = {
     zh = {
         MN = "CCG挑战合集",
         ST = "蓝或白",
-        T0 = "对应挑战：blue or white",
+        T0 = "对应挑战："..challengeName,
         N0 = "永恒之心生成几率:",
         K0 = "里抹大拉击杀敌人时生成永恒之心取代红心的几率",
         N1 = "魂心生成几率:",
@@ -59,7 +60,7 @@ local BOW_MCM = {
     },
     en = {
         MN = "CCG Challenge Collection",
-        ST = "Blue or White",
+        ST = challengeName,
         --T0 = "Corresponding Challenge: blue or white",
         N0 = "Eternal Heart Spawn Chance:",
         K0 = "Chance to spawn an Eternal Heart instead of a Red Heart when killing enemies with Tainted Magdalene",

@@ -1,6 +1,7 @@
 local mod = CCGChallenges45768
 local utils=require("script.CCG_utils")
-local challengeId = utils.GetChallengeSafe("conjugated gemini")
+local challengeName="conjugated gemini"
+local challengeId = utils.GetChallengeSafe(challengeName)
 if challengeId == nil then
     return nil
 end
