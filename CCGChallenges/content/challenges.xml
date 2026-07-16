@@ -40,5 +40,6 @@
         difficulty="2"
         endstage="7"
         name="ultra hard greed"
+        getcurse="100"
     />
 </challenges>
