@@ -51,6 +51,19 @@ function Utils.getRNG()
 end
 
 
+function Utils.addTrinket(cId,trinketId)
+    mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT,function ()
+        if Game().Challenge == cId then
+            local player=Isaac.GetPlayer()
+            if not player:HasTrinket(trinketId) then
+                player:AddTrinket(trinketId)
+            end
+            player:UsePill(PillEffect.PILLEFFECT_GULP,PillColor.PILL_NULL,UseFlag.USE_NOANIM | UseFlag.USE_NOANNOUNCER | UseFlag.USE_NOCOSTUME | UseFlag.USE_NOHUD)
+        end
+    end)
+end
+
+
 
 local ChallengesSP={}
 function Utils.allowChallengeSecretPath(cId,isEnd13)

@@ -87,15 +87,8 @@ local function resetShitNumPerGame(_, isC)
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, resetShitNumPerGame)
-local function addNo(_)
-    if Game().Challenge == challengeId then
-        local player=Isaac.GetPlayer()
-        if player:HasTrinket(TrinketType.TRINKET_NO) then
-            player:UsePill(PillEffect.PILLEFFECT_GULP,PillColor.PILL_NULL,UseFlag.USE_NOANIM | UseFlag.USE_NOANNOUNCER | UseFlag.USE_NOCOSTUME | UseFlag.USE_NOHUD)
-        end
-    end
-end
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT,addNo)
+
+utils.addTrinket(challengeId,TrinketType.TRINKET_NO)
 
 ---------------------------------------------------------------------
 local DNPUS_MCM = {
