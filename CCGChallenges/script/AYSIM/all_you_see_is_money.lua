@@ -134,7 +134,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.totalScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N0") ..
-                    string.format("1 X %d", setting.totalScale)
+                    string.format(" %d", setting.totalScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N0") ..
                     string.format("1 / %d", 1/setting.totalScale)
@@ -163,7 +163,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.PennyScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N1") ..
-                    string.format("1 X %d",setting.PennyScale)
+                    string.format(" %d",setting.PennyScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N1") ..
                     string.format("1 / %d",1/setting.PennyScale)
@@ -192,7 +192,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.NickelScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N2") ..
-                    string.format("1 X %d", setting.NickelScale)
+                    string.format(" %d", setting.NickelScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N2") ..
                     string.format("1 / %d", 1/setting.NickelScale)
@@ -221,7 +221,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.DimeScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N3") ..
-                    string.format("1 X %d", setting.DimeScale)
+                    string.format(" %d", setting.DimeScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N3") ..
                     string.format("1 / %d", 1/setting.DimeScale)
@@ -250,7 +250,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.DoublePennyScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N4") ..
-                    string.format("1 X %d", setting.DoublePennyScale)
+                    string.format(" %d", setting.DoublePennyScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N4") ..
                     string.format("1 / %d", 1/setting.DoublePennyScale)
@@ -279,7 +279,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.LuckyPennyScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N5") ..
-                    string.format("1 X %d", setting.LuckyPennyScale)
+                    string.format(" %d", setting.LuckyPennyScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N5") ..
                     string.format("1 / %d", 1/setting.LuckyPennyScale)
@@ -308,7 +308,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.StickyNickelScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N6") ..
-                    string.format("1 X %d", setting.StickyNickelScale)
+                    string.format(" %d", setting.StickyNickelScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N6") ..
                     string.format("1 / %d", 1/setting.StickyNickelScale)
@@ -337,7 +337,7 @@ if ModConfigMenu and setting~=nil then
         Display = function()
             if setting.GoldenPennyScale>=1 then
                 return utils.getMCMDes(AYSIM_MCM, "N7") ..
-                    string.format("1 X %d", setting.GoldenPennyScale)
+                    string.format(" %d", setting.GoldenPennyScale)
             else
                 return utils.getMCMDes(AYSIM_MCM, "N7") ..
                     string.format("1 / %d", 1/setting.GoldenPennyScale)

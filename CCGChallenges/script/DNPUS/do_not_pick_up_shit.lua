@@ -160,7 +160,7 @@ if ModConfigMenu and setting ~= nil then
         Display = function()
             if setting.autoIncrease >= 1 then
                 return utils.getMCMDes(DNPUS_MCM, "N1") ..
-                    string.format("1 X %d", setting.autoIncrease)
+                    string.format(" %d", setting.autoIncrease)
             else
                 return utils.getMCMDes(DNPUS_MCM, "N1") ..
                     string.format("1 / %d", 1 / setting.autoIncrease)
