@@ -8,15 +8,22 @@ end
 utils.allowChallengeSecretPath(challengeId,true)
 
 local itemConfig=Isaac.GetItemConfig()
+local invalidItem={[59]=true }
 local frameInterval=300
 local itemTotalNum=732
 local function getNextItem(i,change)
-    local nextItemId=i+change
-    local config=itemConfig:GetCollectible(nextItemId)
-    while config==nil and nextItemId>0 and nextItemId<=itemTotalNum do
+    local nextItemId=i
+    local config=nil
+    repeat
         nextItemId=nextItemId+change
+        if invalidItem[nextItemId] then
+            nextItemId=nextItemId+change
+        end
         config=itemConfig:GetCollectible(nextItemId)
-    end
+        if nextItemId<=0 or nextItemId>itemTotalNum then
+            break
+        end
+    until config~=nil
     return config,nextItemId
 end
 local function itemCountDown()
@@ -28,28 +35,18 @@ local function itemCountDown()
                 if player:HasCollectible(i,true) then
                     local config=itemConfig:GetCollectible(i)
                     local nextItemId=i
-                    if config.Type==ItemType.ITEM_ACTIVE then
-                        local config2=nil
+                    local isActive=config.Type==ItemType.ITEM_ACTIVE
+                    local config2=nil
+                    repeat
                         config2,nextItemId=getNextItem(nextItemId,change)
-                        while config2.Type~=ItemType.ITEM_ACTIVE and nextItemId>0 and nextItemId<=itemTotalNum do
-                            config2,nextItemId=getNextItem(nextItemId,change)
-                            if config2==nil then
-                                break
-                            end
+                        if config2 == nil then
+                            break
                         end
-                        if nextItemId>0 and nextItemId<=itemTotalNum then
-                            player:RemoveCollectible(i,true)
-                            player:AddCollectible(nextItemId,0,false)
+                        if isActive == (config2.Type == ItemType.ITEM_ACTIVE) then
+                            break
                         end
-                    elseif config.Type==ItemType.ITEM_PASSIVE or config.Type==ItemType.ITEM_FAMILIAR then
-                        local config2=nil
-                        config2,nextItemId=getNextItem(nextItemId,change)
-                        while config2.Type~=ItemType.ITEM_PASSIVE and config.Type~=ItemType.ITEM_FAMILIAR and nextItemId>0 and nextItemId<=itemTotalNum do
-                            config2,nextItemId=getNextItem(nextItemId,change)
-                            if config2==nil then
-                                break
-                            end
-                        end
+                    until nextItemId<=0 or nextItemId>itemTotalNum
+                    while player:HasCollectible(i,true) do
                         player:RemoveCollectible(i,true)
                         if nextItemId>0 and nextItemId<=itemTotalNum then
                             player:AddCollectible(nextItemId,0,false)
