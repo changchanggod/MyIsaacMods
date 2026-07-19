@@ -12,21 +12,16 @@ end
 mod.Cham={}
 if mod:HasData() then
     local data=mod:LoadData()
-    mod.noCham=json.decode(data)
-    print(1)
-else
-    print(2)
+    mod.Cham=json.decode(data)
 end
 ---@param EntN EntityNPC
 function mod:try(EntN)
     if EntN:IsChampion() then
-        mod.Cham[TypeToNum(EntN.Type,EntN.Variant,EntN.SubType)]=true
-        print(EntN.Type,EntN.Variant,EntN.SubType)
+        mod.Cham[tostring(TypeToNum(EntN.Type,EntN.Variant,EntN.SubType))]=true
     end
 end
 mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT, mod.try)
-function mod:save()
-    
+function mod:saveMyData()
     mod:SaveData(json.encode(mod.Cham))
 end
-mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT,mod.save)
+mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT,mod.saveMyData)
