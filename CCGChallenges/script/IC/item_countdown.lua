@@ -31,6 +31,10 @@ local function itemCountDown()
         if Game():GetFrameCount()% frameInterval==0 then
             local player=Isaac.GetPlayer()
             local change=Game():GetLevel():IsAscent() and 1 or -1
+            local charges={}
+            for i=0,3 do
+                charges[i]=player:GetActiveCharge(i)+player:GetBatteryCharge(i)            
+            end
             for i=1,itemTotalNum do
                 if player:HasCollectible(i,true) then
                     local config=itemConfig:GetCollectible(i)
@@ -53,6 +57,9 @@ local function itemCountDown()
                         end
                     end
                 end
+            end
+            for i=0,3 do
+                player:SetActiveCharge(charges[i],i)              
             end
         end
     end
