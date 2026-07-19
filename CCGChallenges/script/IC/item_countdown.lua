@@ -5,7 +5,7 @@ local challengeId = utils.GetChallengeSafe(challengeName)
 if challengeId == nil then
     return nil
 end
-utils.allowChallengeSecretPath(challengeId,true)
+utils.allowChallengeSecretPath(challengeId,false)
 
 local itemConfig=Isaac.GetItemConfig()
 local invalidItem={[59]=true }

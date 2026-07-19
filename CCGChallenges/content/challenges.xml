@@ -45,7 +45,7 @@
     <challenge
         playertype="0"
         difficulty="0"
-        endstage="13"
+        endstage="11"
         name="item countdown"
     />
 </challenges>
