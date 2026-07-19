@@ -42,14 +42,14 @@ for key, v in pairs(championWeight) do
     table.insert(prefix, {sum = total, data = key})
 end
 
-local championIgnore={}
+local champion={}
 ---@param entN EntityNPC
 local function turnIntoChampion(_,entN)
     if Game().Challenge==challengeId then
         if entN.SpawnerEntity then
             print(entN.Type,entN.Variant,entN.SubType)
         end
-        if entN:IsBoss() or entN:IsChampion() or championIgnore[utils.TypeToNum(entN.Type,entN.Variant,entN.SubType)] then
+        if entN:IsBoss() or entN:IsChampion() or champion[utils.TypeToNum(entN.Type,entN.Variant,entN.SubType)]==nil then
             return
         end
         local rand=myRNG:RandomInt(total)+1
