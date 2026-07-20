@@ -42,4 +42,10 @@
         name="ultra hard greed"
         getcurse="100"
     />
+    <challenge
+        playertype="0"
+        difficulty="0"
+        endstage="13"
+        name="item countdown"
+    />
 </challenges>
