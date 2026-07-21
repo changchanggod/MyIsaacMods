@@ -48,4 +48,11 @@
         endstage="11"
         name="item countdown"
     />
+    <challenge
+        playertype="0"
+        difficulty="0"
+        endstage="11"
+        name="rock up"
+        startingitems="105"
+    />
 </challenges>

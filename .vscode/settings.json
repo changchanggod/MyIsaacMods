@@ -3,9 +3,12 @@
         ".anm2": "xml"
     },
     "cSpell.words": [
+        "altpath",
         "AYSIM",
         "DNPUS",
         "endstage",
+        "FIREDELAY",
+        "getcurse",
         "MCMDes",
         "NOANIM",
         "PILLEFFECT",
@@ -15,6 +18,7 @@
         "SHOOTDOWN",
         "SHOOTLEFT",
         "SHOOTRIGHT",
-        "SHOOTUP"
+        "SHOOTUP",
+        "SHOTSPEED"
     ]
 }
