@@ -44,12 +44,14 @@
     />
     <challenge
         playertype="0"
+        achievements="78,34"
         difficulty="0"
         endstage="11"
         name="item countdown"
     />
     <challenge
         playertype="0"
+        achievements="78,34"
         difficulty="0"
         endstage="11"
         name="rock up"

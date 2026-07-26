@@ -34,10 +34,8 @@ function mod:blue_or_white(EntP)
             local rand=myRNG:RandomInt(100)
             if rand<setting.soulHeartChance then
                 EntP:Morph(EntityType.ENTITY_PICKUP,PickupVariant.PICKUP_HEART,8)
-                print(EntP.FrameCount)
             else
                 EntP:Morph(EntityType.ENTITY_PICKUP,PickupVariant.PICKUP_HEART,4)
-                print(EntP.FrameCount)
             end
         end 
     end
