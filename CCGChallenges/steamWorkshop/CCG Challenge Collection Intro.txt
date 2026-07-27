@@ -14,7 +14,7 @@ I developed 8 entirely unique custom challenges from scratch via custom code, de
 This pack has no unified central theme. Every challenge was built around a random fun concept I came up with and fully implemented through code. "CCG" stands for my personal initials — the only common trait all challenges share is that I created every single one.
 [*][b]Difficulty design[/b]
 The Binding of Isaac is a single-player game, and player skill levels vary widely. When designing these challenges, I prioritized fun over perfectly balanced difficulty. Feel free to tweak the difficulty mid-run using the debug console if you find any challenge too tough — even I cannot beat every challenge myself.
-If you have the Mod Config Menu mod installed: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2494192799]Steam Workshop - Mod Config Menu[/url], this mod supports full parameter adjustment for multiple challenges.
+If you have the Mod Config Menu mod installed: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3701683951]Steam Workshop - Mod Config Menu[/url], this mod supports full parameter adjustment for multiple challenges.
 [*][b]Testing & bug reports[/b]
 This mod is a solo personal project, so I did not have enough time to test every edge case thoroughly. If you encounter any bugs, you can leave a comment on this workshop page or submit an issue on [url=https://github.com/changchanggod/MyIsaacMods]my GitHub repository[/url]. I appreciate your patience and understanding.
 For the most stable gameplay experience, I recommend playing on Windows with The Binding of Isaac: Repentance.

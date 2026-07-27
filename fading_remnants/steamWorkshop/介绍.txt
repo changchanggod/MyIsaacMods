@@ -1,0 +1,16 @@
+[h2]模组介绍[/h2]
+本模组会自动清理场景内无用实体，包含以下对象：
+- 已开启的宝箱
+- 损坏献血机
+- 损坏预言机
+- 损坏赌博机
+- 损坏补货机
+以及其他同类废弃实体。
+
+D20大量生成开启宝箱、创世纪达摩剑组合拳的残留底座会影响游戏体验，为此制作了本模组。
+
+[h3]自定义设置[/h3]
+若你已订阅 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2494192799]Mod Config Menu[/url]，可自由调整实体淡出动画相关参数。
+
+[h3]反馈与BUG提交[/h3]
+遇到BUG可在评论区留言反馈，也可前往我的 [url=https://github.com/changchanggod/MyIsaacMods]GitHub仓库[/url] 提交Issue，欢迎各位提出建议。
