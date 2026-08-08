@@ -57,92 +57,103 @@ else
     reset()
 end
 local fadeDelay = {}
+local function getEntityKey(Ent)
+    return Ent.Type .. ":" .. Ent.Variant .. ":" .. Ent.Index
+end
+
 ---@param Ent  Entity
 local function isInFadeDelay(Ent)
-    if fadeDelay[Ent.Index] == nil then
-        fadeDelay[Ent.Index] = Ent.FrameCount
+    local key = getEntityKey(Ent)
+    if fadeDelay[key] == nil then
+        fadeDelay[key] = Ent.FrameCount
         return true
-    elseif Ent.FrameCount - fadeDelay[Ent.Index] >= delay[mod.setting.fadeDelay] then
+    elseif Ent.FrameCount - fadeDelay[key] >= delay[mod.setting.fadeDelay] then
         return false
     end
     return true
 end
 
+local function clearFadeDelay(Ent)
+    fadeDelay[getEntityKey(Ent)] = nil
+end
+
+-- Sprite.Color and Entity.SpriteScale are value properties.  Their individual
+-- components must be copied into a new Color/Vector and assigned back.
+local function setSpriteAlpha(sprite, alpha)
+    local color = sprite.Color
+    sprite.Color = Color(color.R, color.G, color.B, alpha, color.RO, color.GO, color.BO)
+end
+
+local function setEntityScale(Ent, x, y)
+    Ent.SpriteScale = Vector(x, y)
+end
+
+local function fadeEntity(Ent, onFinished)
+    local rate = speed[mod.setting.fadeType][mod.setting.fadeRate]
+    if mod.setting.fadeType == FadeType.fade then
+        local spr = Ent:GetSprite()
+        local alpha = spr.Color.A
+        if alpha > 0 then
+            setSpriteAlpha(spr, math.max(alpha - rate, 0))
+            return
+        end
+    end
+
+    local scale = Ent.SpriteScale
+    if scale.X > 0 and scale.Y > 0 then
+        setEntityScale(Ent, math.max(scale.X - rate, 0), math.max(scale.Y - rate, 0))
+    else
+        onFinished(Ent)
+    end
+end
+
 local eternalChest = {}
 ---@param EntPick  EntityPickup
 local function removeChest(EntPick)
+    local key = getEntityKey(EntPick)
     if EntPick.Variant == PickupVariant.PICKUP_ETERNALCHEST then
-        if eternalChest[EntPick.Index] == nil then
-            eternalChest[EntPick.Index] = EntPick.FrameCount
+        if eternalChest[key] == nil then
+            eternalChest[key] = EntPick.FrameCount
             return
-        elseif EntPick.FrameCount - eternalChest[EntPick.Index] > eternalChestFrame then
+        elseif EntPick.FrameCount - eternalChest[key] > eternalChestFrame then
             EntPick:Remove()
-            -- else
-            --     print(EntPick.FrameCount - eternalChest[EntPick.Index])
+            eternalChest[key] = nil
+            clearFadeDelay(EntPick)
         end
     else
         EntPick:Remove()
+        clearFadeDelay(EntPick)
     end
 end
 ---@param EntPick  EntityPickup
 function mod:fadeChest(EntPick)
     local isItem = EntPick.Variant == 100
     if chestVariant[EntPick.Variant] or isItem then
-        local rate = speed[mod.setting.fadeType][mod.setting.fadeRate]
         if EntPick.SubType == ChestSubType.CHEST_OPENED then --ChestSubType.CHEST_OPENED=0. when pickup is an item, subType=0 means empty, so they are the same situations
             if isInFadeDelay(EntPick) then
                 return
             end
-            if mod.setting.fadeType == FadeType.fade then
-                local spr = EntPick:GetSprite()
-                if spr.Color.A > 0 then
-                    spr.Color.A = math.max(spr.Color.A - rate, 0)
-                elseif EntPick.SpriteScale.X > 0 and EntPick.SpriteScale.Y > 0 then
-                    EntPick.SpriteScale.X = math.max(EntPick.SpriteScale.X - rate, 0)
-                    EntPick.SpriteScale.Y = math.max(EntPick.SpriteScale.Y - rate, 0)
-                else
-                    removeChest(EntPick)
-                end
-            elseif mod.setting.fadeType == FadeType.scale then
-                if EntPick.SpriteScale.X > 0 and EntPick.SpriteScale.Y > 0 then
-                    EntPick.SpriteScale.X = math.max(EntPick.SpriteScale.X - rate, 0)
-                    EntPick.SpriteScale.Y = math.max(EntPick.SpriteScale.Y - rate, 0)
-                else
-                    removeChest(EntPick)
-                end
-                -- elseif mod.setting.fadeType == FadeType.timeOut then
-                --     if EntPick.Timeout < 0 then
-                --         EntPick.Timeout = rate
-                --     end
-                --     if EntPick.Variant == PickupVariant.PICKUP_ETERNALCHEST then
-                --         if eternalChest[EntPick.Index] == nil then
-                --             eternalChest[EntPick.Index] = EntPick.FrameCount
-                --             EntPick.Timeout = rate
-                --         elseif EntPick.FrameCount - eternalChest[EntPick.Index] <= eternalChestFrame then
-                --             EntPick.Timeout = rate
-                --         end
-                --     end
-            end
+            fadeEntity(EntPick, removeChest)
         else
-            fadeDelay[EntPick.Index] = nil
+            clearFadeDelay(EntPick)
             if EntPick.Variant == PickupVariant.PICKUP_ETERNALCHEST then
-                eternalChest[EntPick.Index] = nil
+                local key = getEntityKey(EntPick)
+                eternalChest[key] = nil
+                local rate = speed[mod.setting.fadeType][mod.setting.fadeRate]
                 if mod.setting.fadeType == FadeType.fade then
                     local spr = EntPick:GetSprite()
                     if spr.Color.A < 1 then
-                        spr.Color.A = math.min(spr.Color.A + rate, 1)
+                        setSpriteAlpha(spr, math.min(spr.Color.A + rate, 1))
                     end
-                    if EntPick.SpriteScale.X < 1 and EntPick.SpriteScale.Y < 1 then
-                        EntPick.SpriteScale.X = math.min(EntPick.SpriteScale.X + rate, 1)
-                        EntPick.SpriteScale.Y = math.min(EntPick.SpriteScale.Y + rate, 1)
+                    local scale = EntPick.SpriteScale
+                    if scale.X < 1 and scale.Y < 1 then
+                        setEntityScale(EntPick, math.min(scale.X + rate, 1), math.min(scale.Y + rate, 1))
                     end
                 elseif mod.setting.fadeType == FadeType.scale then
-                    if EntPick.SpriteScale.X < 1 and EntPick.SpriteScale.Y < 1 then
-                        EntPick.SpriteScale.X = math.min(EntPick.SpriteScale.X + rate, 1)
-                        EntPick.SpriteScale.Y = math.min(EntPick.SpriteScale.Y + rate, 1)
+                    local scale = EntPick.SpriteScale
+                    if scale.X < 1 and scale.Y < 1 then
+                        setEntityScale(EntPick, math.min(scale.X + rate, 1), math.min(scale.Y + rate, 1))
                     end
-                    -- elseif mod.setting.fadeType == FadeType.timeOut then
-                    --     EntPick.Timeout = -1
                 end
             end
         end
@@ -167,41 +178,17 @@ function mod:fadeSlotMachine()
     for _, value in pairs(entities) do
         if value.Type == 6 then
             if value:GetSprite():GetAnimation() == "Broken" or value:GetSprite():GetAnimation() == "Death" then
+                -- Slot machines are not pickups, so MC_PRE_PICKUP_COLLISION cannot
+                -- disable their collision.  Remove it as soon as they become debris.
+                value.EntityCollisionClass = EntityCollisionClass.ENTCOLL_NONE
                 if not isInFadeDelay(value) then
-                    local Ent = value
-                    local rate = speed[mod.setting.fadeType][mod.setting.fadeRate]
-                    if mod.setting.fadeType == FadeType.fade then
-                        local spr = Ent:GetSprite()
-                        if spr.Color.A > 0 then
-                            spr.Color.A = math.max(spr.Color.A - rate, 0)
-                        elseif Ent.SpriteScale.X > 0 and Ent.SpriteScale.Y > 0 then
-                            Ent.SpriteScale.X = math.max(Ent.SpriteScale.X - rate, 0)
-                            Ent.SpriteScale.Y = math.max(Ent.SpriteScale.Y - rate, 0)
-                        else
-                            Ent:Remove()
-                        end
-                    elseif mod.setting.fadeType == FadeType.scale then
-                        if Ent.SpriteScale.X > 0 and Ent.SpriteScale.Y > 0 then
-                            Ent.SpriteScale.X = math.max(Ent.SpriteScale.X - rate, 0)
-                            Ent.SpriteScale.Y = math.max(Ent.SpriteScale.Y - rate, 0)
-                        else
-                            Ent:Remove()
-                        end
-                        -- elseif mod.setting.fadeType == FadeType.timeOut then
-                        --     --TODO
-                        --     local spr = Ent:GetSprite()
-                        --     if spr.Color.A > 0 then
-                        --         spr.Color.A = math.max(spr.Color.A - rate, 0)
-                        --     elseif Ent.SpriteScale.X > 0 and Ent.SpriteScale.Y > 0 then
-                        --         Ent.SpriteScale.X = math.max(Ent.SpriteScale.X - rate, 0)
-                        --         Ent.SpriteScale.Y = math.max(Ent.SpriteScale.Y - rate, 0)
-                        --     else
-                        --         Ent:Remove()
-                        --     end
-                    end
+                    fadeEntity(value, function(Ent)
+                        clearFadeDelay(Ent)
+                        Ent:Remove()
+                    end)
                 end
             else
-                fadeDelay[value.Index] = nil
+                clearFadeDelay(value)
             end
         end
     end
