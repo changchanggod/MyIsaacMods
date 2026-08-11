@@ -35,6 +35,7 @@ end
 
 local mapping = {}
 local entityPosCache = {}
+local flipXCache = {}
 
 ----------------------------------------------------------------------------
 -- Entity Category Check
@@ -131,23 +132,17 @@ end
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 
 ----------------------------------------------------------------------------
--- Render: Apply SpriteOffset & Chain Propagation
+-- Render: Build entityPosCache & Chain Propagation
 ----------------------------------------------------------------------------
 local fixArgs=0.65
 function mod:onRender()
     local entities = Isaac.GetRoomEntities()
-    local cache = {}
     entityPosCache = {}
+    local cache = {}
     for _, e in ipairs(entities) do
         if e:Exists() then
             cache[e.Index] = e
             entityPosCache[e.Index] = e.Position
-        end
-    end
-    for srcIdx, _ in pairs(mapping) do
-        local src = cache[srcIdx]
-        if src then
-            src.SpriteOffset = Vector(0, 0)
         end
     end
 
@@ -168,15 +163,6 @@ function mod:onRender()
             end
             if cur and cache[cur] then
                 nextMapping[srcIdx] = cur
-                local dx = cache[cur].Position.X - src.Position.X
-                local dy = cache[cur].Position.Y - src.Position.Y
-                if src.FlipX then
-                    dx = -dx
-                end
-                if src.FlipY then
-                    dy = -dy
-                end
-                src.SpriteOffset = Vector(dx, dy)*fixArgs
             end
         end
     end
@@ -190,30 +176,34 @@ mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 -- NPC Update: Apply SpriteOffset per NPC
 ----------------------------------------------------------------------------
 
+local function round2(v)
+    return math.floor(v * 100 + 0.5) * 0.01
+end
+
 function mod:onNpcUpdate(npc)
     if next(mapping) == nil then
         return
     end
 
-    local tgtIdx = mapping[npc.Index]
-    if not tgtIdx then
+    if not mapping[npc.Index] then
         return
     end
 
-    local tgtPos = entityPosCache[tgtIdx]
-    if not tgtPos then
+    local prevFlipX = flipXCache[npc.Index]
+    if prevFlipX == nil then
+        flipXCache[npc.Index] = npc.FlipX
         return
     end
 
-    local dx = tgtPos.X - npc.Position.X
-    local dy = tgtPos.Y - npc.Position.Y
-    if npc.FlipX then
-        dx = -dx
+    if prevFlipX ~= npc.FlipX then
+        flipXCache[npc.Index] = npc.FlipX
+        local offset = npc.SpriteOffset
+        local x = -offset.X
+        if npc.FlipX then
+            x = x / (npc.SpriteScale.X*2-1)
+        end
+        npc.SpriteOffset = Vector(x, offset.Y)
     end
-    if npc.FlipY then
-        dy = -dy
-    end
-    npc.SpriteOffset = Vector(dx, dy)*fixArgs
 end
 
 mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
@@ -221,7 +211,7 @@ mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
 ----------------------------------------------------------------------------
 -- NPC Render: Apply SpriteOffset per NPC
 ----------------------------------------------------------------------------
-
+---@param npc  EntityNPC
 function mod:onNpcRender(npc, _)
     if next(mapping) == nil then
         return
@@ -237,13 +227,10 @@ function mod:onNpcRender(npc, _)
         return
     end
 
-    local dx = tgtPos.X - npc.Position.X
-    local dy = tgtPos.Y - npc.Position.Y
+    local dx = round2(tgtPos.X - npc.Position.X)
+    local dy = round2(tgtPos.Y - npc.Position.Y)
     if npc.FlipX then
-        dx = -dx
-    end
-    if npc.FlipY then
-        dy = -dy
+        dx = -dx / (npc.SpriteScale.X*2-1)
     end
     npc.SpriteOffset = Vector(dx, dy)*fixArgs
 end
