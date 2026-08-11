@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>skin shuffle</name>
+    <directory>skin_shuffle</directory>
+    <id>0</id>
+    <description>[h1]Skin Shuffle[/h1]
+[h2]What It Does[/h2]
+Randomly shuffles the sprite positions of room entities, creating visual chaos. Each entity's sprite is rendered at another entity's location.
+
+[h2]Features[/h2]
+[list]
+[*]Random derangement mapping - no entity maps to itself
+[*]Chain propagation when entities die
+[*]Configurable via Mod Config Menu - choose which entity types participate
+[/list]
+
+[h2]Entity Type Options[/h2]
+[list]
+[*]Normal Monsters
+[*]Bosses
+[*]Player
+[*]Pickups
+[*]Friendly Monsters
+[*]Invulnerable Traps
+[/list]
+
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=2681872191]Mod Config Menu Pure[/url] is recommended for in-game settings.</description>
+    <version>1.0</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Tweaks"/>
+</metadata>

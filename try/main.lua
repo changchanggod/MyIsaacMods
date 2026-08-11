@@ -25,3 +25,21 @@ function mod:saveMyData()
     mod:SaveData(json.encode(mod.Cham))
 end
 mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT,mod.saveMyData)
+
+
+-- function mod:onRender()
+--     local entities = Isaac.GetRoomEntities()
+--     local player=Isaac.GetPlayer()
+--     for _, e in ipairs(entities) do
+--         if e:Exists() then
+--             local dx = player.Position.X - e.Position.X
+--             local dy = player.Position.Y - e.Position.Y
+--             if  e.FlipX then
+--                 dx = -dx
+--             end
+--             e.SpriteOffset=Vector(dx, dy)*0.65
+--         end
+--     end
+-- end
+
+-- mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
