@@ -34,6 +34,7 @@ end
 local mapping = {}
 local entityPosCache = {}
 local flipXCache = {}
+local flipYCache = {}
 
 ----------------------------------------------------------------------------
 -- Entity Category Check
@@ -183,19 +184,36 @@ function mod:onNpcUpdate(npc)
         return
     end
 
+    local spr = npc:GetSprite()
     local prevFlipX = flipXCache[npc.Index]
+    local prevFlipY = flipYCache[npc.Index]
     if prevFlipX == nil then
-        prevFlipX=false
+        prevFlipX = false
+    end
+    if prevFlipY == nil then
+        prevFlipY = false
     end
 
-    if prevFlipX ~= npc.FlipX then
+    if prevFlipX ~= npc.FlipX or prevFlipY ~= spr.FlipY then
         flipXCache[npc.Index] = npc.FlipX
+        flipYCache[npc.Index] = spr.FlipY
         local offset = npc.SpriteOffset
-        local x = -offset.X
-        if npc.FlipX then
-            x = x / (npc.SpriteScale.X*2-1)
+        local x = offset.X
+        local y = offset.Y
+        if prevFlipX ~= npc.FlipX then
+            x = -x
+            if npc.FlipX then
+                x = x / (npc.SpriteScale.X * 2 - 1)
+            end
         end
-        npc.SpriteOffset = Vector(x, offset.Y)
+        if spr.FlipY then
+            if x > 0 then
+                x = x - 2 * y
+            else
+                x = x + 2 * y
+            end
+        end
+        npc.SpriteOffset = Vector(x, y)
     end
 end
 
@@ -224,6 +242,14 @@ function mod:onNpcRender(npc, _)
     local dy = round2(tgtPos.Y - npc.Position.Y)
     if npc.FlipX then
         dx = -dx / (npc.SpriteScale.X*2-1)
+    end
+    local spr=npc:GetSprite()
+    if spr.FlipY then
+        if dx>0 then
+            dx=dx-2*dy
+        else
+            dx=dx+2*dy
+        end
     end
     npc.SpriteOffset = Vector(dx, dy)*fixArgs
 end

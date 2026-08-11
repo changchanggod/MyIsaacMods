@@ -49,13 +49,9 @@ function mod:onNpcRender(npc, _)
     local spr=npc:GetSprite()
 
     npc.SpriteOffset=Vector(offsetScale,sprScale)
-    if npc.FlipX then
-        npc.SpriteOffset=Vector(-100,100)
-        
-    end
     if spr.FlipY then
-        npc.SpriteOffset=Vector(offsetScale- sprScale*2 ,sprScale)
-        print(1)
+        npc.SpriteOffset=Vector(offsetScale+ sprScale*2 ,sprScale)
+        print(spr.FlipX)
     end
     local game = Game()
     local room = game:GetRoom()
@@ -67,18 +63,19 @@ end
 mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.onNpcRender)
 
 -- 进入新房间时执行
-function mod:SpawnChampionGaper()
-    local game = Game()
-    local room = game:GetRoom()
+-- function mod:SpawnChampionGaper()
+--     local game = Game()
+--     local room = game:GetRoom()
 
-    -- 获取房间中心世界坐标
-    local centerPos = room:GetCenterPos()
+--     -- 获取房间中心世界坐标
+--     local centerPos = room:GetCenterPos()
 
-    -- 在中心生成裂口尸，无变体、无子类型、初始速度为0
-    local enemy = Isaac.Spawn(240, 0, 0, centerPos, Vector.Zero, nil)
-end
+--     -- 在中心生成裂口尸，无变体、无子类型、初始速度为0
+--     local enemy = Isaac.Spawn(240, 0, 0, centerPos, Vector.Zero, nil)
+-- end
 
--- 注册进入房间回调
-mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.SpawnChampionGaper)
+-- -- 注册进入房间回调
+-- mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.SpawnChampionGaper)
 
--- l  Isaac.Spawn(240, 0, 0, Vector(0,280), Vector.Zero, nil)
+-- l  Isaac.Spawn(240, 0, 0, Vector(320,580), Vector.Zero, nil)
+-- l local game = Game() room = game:GetRoom() centerPos = room:GetCenterPos() print(centerPos)
