@@ -5,10 +5,9 @@ local Category = {
     MASTER = 1,
     NORMAL = 2,
     BOSS = 3,
-    PLAYER = 4,
-    PICKUP = 5,
-    FRIENDLY = 6,
-    INVULNERABLE = 7,
+    PICKUP = 4,
+    FRIENDLY = 5,
+    INVULNERABLE = 6,
 }
 
 local function reset()
@@ -16,7 +15,6 @@ local function reset()
         [Category.MASTER] = true,
         [Category.NORMAL] = true,
         [Category.BOSS] = false,
-        [Category.PLAYER] = false,
         [Category.PICKUP] = false,
         [Category.FRIENDLY] = false,
         [Category.INVULNERABLE] = false,
@@ -56,12 +54,6 @@ local function isEntityIncluded(entity)
 
     if mod.setting[Category.BOSS] then
         if entity:IsBoss() then
-            return true
-        end
-    end
-
-    if mod.setting[Category.PLAYER] then
-        if entity.Type == EntityType.ENTITY_PLAYER then
             return true
         end
     end
@@ -127,6 +119,8 @@ function mod:onNewRoom()
     for i = 1, n do
         mapping[included[i]] = included[(i % n) + 1]
     end
+    entityPosCache = {}
+    flipXCache = {}
 end
 
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
@@ -191,8 +185,7 @@ function mod:onNpcUpdate(npc)
 
     local prevFlipX = flipXCache[npc.Index]
     if prevFlipX == nil then
-        flipXCache[npc.Index] = npc.FlipX
-        return
+        prevFlipX=false
     end
 
     if prevFlipX ~= npc.FlipX then
@@ -253,44 +246,48 @@ mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.saveSettings)
 
 local FC_MCM = {
     zh = {
-        MN = "Skin Shuffle",
-        ST = "\xE8\xAE\xBE\xE7\xBD\xAE",
-        N0 = "\xE6\x80\xBB\xE5\xBC\x80\xE5\x85\xB3: ",
-        N1 = "\xE6\x99\xAE\xE9\x80\x9A\xE6\x80\xAA\xE7\x89\xA9: ",
+        MN = "物影错置",
+        ST = "\232\174\190\231\189\174",
+        N0 = "\230\128\187\229\188\128\229\133\179: ",
+        O0 = { "\229\133\179", "\229\188\128" },
+        K0 = "\228\184\128\233\148\174\229\188\128\229\144\175/229\133\179\233\151\173\230\137\128\230\156\137\229\174\158\228\189\147",
+        N1 = "\230\153\174\233\128\154\230\128\170\231\137\169: ",
+        O1 = { "\229\133\179", "\229\188\128" },
+        K1 = "\229\140\133\230\139\172\230\153\174\233\128\154\230\149\140\228\186\186(\233\157\158Boss\227\128\129\233\157\158\229\143\139\229\165\189\227\128\129\229\143\175\229\143\151\228\188\164\229\174\179)",
         N2 = "Boss: ",
-        N3 = "\xE7\x8E\xA9\xE5\xAE\xB6: ",
-        N4 = "\xE6\x8E\x89\xE8\x90\xBD\xE7\x89\xA9: ",
-        N5 = "\xE5\x8F\x8B\xE5\xA5\xBD\xE6\x80\xAA\xE7\x89\xA9: ",
-        N6 = "\xE6\x97\xA0\xE6\x95\x8C\xE6\x9C\xBA\xE5\x85\xB3: ",
-        ON = "\xE5\xBC\x80",
-        OFF = "\xE5\x85\xB3",
-        K0 = "\xE4\xB8\x80\xE9\x94\xAE\xE5\xBC\x80\xE5\x90\xAF\x2F\xE5\x85\xB3\xE9\x97\xAD\xE6\x89\x80\xE6\x9C\x89\xE5\xAE\x9E\xE4\xBD\x93",
-        K1 = "\xE5\x8C\x85\xE6\x8B\xAC\xE6\x99\xAE\xE9\x80\x9A\xE6\x95\x8C\xE4\xBA\xBA\x28\xE9\x9D\x9E\x42\x6F\x73\x73\xE3\x80\x81\xE9\x9D\x9E\xE5\x8F\x8B\xE5\xA5\xBD\xE3\x80\x81\xE5\x8F\xAF\xE5\x8F\x97\xE4\xBC\xA4\xE5\xAE\xB3\x29",
-        K2 = "\xE5\x8C\x85\xE6\x8B\xAC\xE5\xB8\xA6\x42\x4F\x53\x53\xE6\xA0\x87\xE5\xBF\x97\xE7\x9A\x84\xE5\xAE\x9E\xE4\xBD\x93",
-        K3 = "\xE5\x8C\x85\xE6\x8B\xAC\xE7\x8E\xA9\xE5\xAE\xB6\xE5\xAE\x9E\xE4\xBD\x93",
-        K4 = "\xE5\x8C\x85\xE6\x8B\xAC\xE5\xBF\x83\xE3\x80\x81\xE7\xA1\xAC\xE5\xB8\x81\xE3\x80\x81\xE7\x82\xB8\xE5\xBC\xB9\xE3\x80\x81\xE9\x92\xA5\xE5\x8C\x99\xE7\xAD\x89\xE6\x8E\x89\xE8\x90\xBD\xE7\x89\xA9",
-        K5 = "\xE5\x8C\x85\xE6\x8B\xAC\xE5\xB8\xA6\x46\x52\x49\x45\x4E\x44\x4C\x59\xE6\xA0\x87\xE5\xBF\x97\xE7\x9A\x84\xE5\xAE\x9E\xE4\xBD\x93",
-        K6 = "\xE5\x8C\x85\xE6\x8B\xAC\xE5\x88\xBA\xE7\x9F\xB3\xE3\x80\x81\xE7\x9F\xB3\xE5\x83\x8F\xE9\xAC\xBC\xE7\xAD\x89\xE4\xB8\x8D\xE5\x8F\xAF\xE7\xA0\xB4\xE5\x9D\x8F\xE7\x9A\x84\xE6\x95\x8C\xE4\xBA\xBA",
+        O2 = { "\229\133\179", "\229\188\128" },
+        K2 = "\229\140\133\230\139\172\229\184\166BOSS\230\160\135\229\191\151\231\154\132\229\174\158\228\189\147",
+        N3 = "\230\142\137\232\144\189\231\137\169: ",
+        O3 = { "\229\133\179", "\229\188\128" },
+        K3 = "\229\140\133\230\139\172\229\191\131\227\128\129\231\161\172\229\184\129\227\128\129\231\130\184\229\188\185\227\128\129\233\146\165\229\140\153\231\173\137\230\142\137\232\144\189\231\137\169",
+        N4 = "\229\143\139\229\165\189\230\128\170\231\137\169: ",
+        O4 = { "\229\133\179", "\229\188\128" },
+        K4 = "\229\140\133\230\139\172\229\184\166FRIENDLY\230\160\135\229\191\151\231\154\132\229\174\158\228\189\147",
+        N5 = "\230\151\160\230\149\140\230\156\186\229\133\179: ",
+        O5 = { "\229\133\179", "\229\188\128" },
+        K5 = "\229\140\133\230\139\172\229\136\186\231\159\179\227\128\129\231\159\179\229\131\143\233\172\188\231\173\137\228\184\141\229\143\175\231\160\180\229\157\143\231\154\132\230\149\140\228\186\186",
     },
     en = {
         MN = "Skin Shuffle",
         ST = "Settings",
         N0 = "Master Switch: ",
-        N1 = "Normal Monsters: ",
-        N2 = "Boss: ",
-        N3 = "Player: ",
-        N4 = "Pickups: ",
-        N5 = "Friendly Monsters: ",
-        N6 = "Invulnerable Traps: ",
-        ON = "ON",
-        OFF = "OFF",
+        O0 = { "OFF", "ON" },
         K0 = "Toggle all entity types on/off",
+        N1 = "Normal Monsters: ",
+        O1 = { "OFF", "ON" },
         K1 = "Include vulnerable non-boss non-friendly enemies",
+        N2 = "Boss: ",
+        O2 = { "OFF", "ON" },
         K2 = "Include entities with BOSS flag",
-        K3 = "Include player entities",
-        K4 = "Include hearts, coins, bombs, keys, etc.",
-        K5 = "Include entities with FRIENDLY flag (charmed, etc.)",
-        K6 = "Include indestructible enemies (stone grimaces, etc.)",
+        N3 = "Pickups: ",
+        O3 = { "OFF", "ON" },
+        K3 = "Include hearts, coins, bombs, keys, etc.",
+        N4 = "Friendly Monsters: ",
+        O4 = { "OFF", "ON" },
+        K4 = "Include entities with FRIENDLY flag (charmed, etc.)",
+        N5 = "Invulnerable Traps: ",
+        O5 = { "OFF", "ON" },
+        K5 = "Include indestructible enemies (stone grimaces, etc.)",
     }
 }
 
@@ -300,7 +297,7 @@ local function getMCMDes(key)
     local zhMCM = ModConfigMenu.i18n == "Chinese"
     if zhMCM and lan ~= "zh" then
         lan = "zh"
-    elseif not zhMCM and lan == "zh" then
+    elseif not (zhMCM) and lan == "zh" then
         lan = "en"
     end
     return FC_MCM[lan] and FC_MCM[lan][key]
@@ -313,40 +310,36 @@ if ModConfigMenu and mod.setting then
     ModConfigMenu.AddSpace(MN, ST)
 
     local settingDescriptors = {
-        { cat = Category.MASTER,    name = "N0", tooltip = "K0", isMaster = true },
-        { cat = Category.NORMAL,    name = "N1", tooltip = "K1" },
-        { cat = Category.BOSS,      name = "N2", tooltip = "K2" },
-        { cat = Category.PLAYER,    name = "N3", tooltip = "K3" },
-        { cat = Category.PICKUP,    name = "N4", tooltip = "K4" },
-        { cat = Category.FRIENDLY,  name = "N5", tooltip = "K5" },
-        { cat = Category.INVULNERABLE, name = "N6", tooltip = "K6" },
+        { cat = Category.MASTER,    name = "N0", opt = "O0", tooltip = "K0", isMaster = true },
+        { cat = Category.NORMAL,    name = "N1", opt = "O1", tooltip = "K1" },
+        { cat = Category.BOSS,      name = "N2", opt = "O2", tooltip = "K2" },
+        { cat = Category.PICKUP,    name = "N3", opt = "O3", tooltip = "K3" },
+        { cat = Category.FRIENDLY,  name = "N4", opt = "O4", tooltip = "K4" },
+        { cat = Category.INVULNERABLE, name = "N5", opt = "O5", tooltip = "K5" },
     }
 
     for _, desc in ipairs(settingDescriptors) do
-        ModConfigMenu.AddSetting(
-            MN, ST,
-            {
-                CurrentSetting = function()
-                    return mod.setting[desc.cat]
-                end,
-                ModifySetting = function(val)
-                    if desc.isMaster then
-                        mod.setting[Category.MASTER] = val
-                        for cat = Category.NORMAL, Category.INVULNERABLE do
-                            mod.setting[cat] = val
-                        end
-                    else
-                        mod.setting[desc.cat] = val
+        ModConfigMenu.AddSetting(MN, ST, {
+            Type = ModConfigMenu.OptionType.NUMBER,
+            CurrentSetting = function()
+                return mod.setting[desc.cat] and 1 or 0
+            end,
+            Minimum = 0,
+            Maximum = 1,
+            Display = function()
+                return getMCMDes(desc.name) .. getMCMDes(desc.opt)[mod.setting[desc.cat] and 2 or 1]
+            end,
+            OnChange = function(n)
+                if desc.isMaster then
+                    mod.setting[Category.MASTER] = n == 1
+                    for cat = Category.NORMAL, Category.INVULNERABLE do
+                        mod.setting[cat] = n == 1
                     end
-                end,
-                Display = function()
-                    local label = getMCMDes(desc.name)
-                    local state = mod.setting[desc.cat] and getMCMDes("ON") or getMCMDes("OFF")
-                    return label .. state
-                end,
-                Type = ModConfigMenu.OptionType.BOOLEAN,
-                Info = { getMCMDes(desc.tooltip) },
-            }
-        )
+                else
+                    mod.setting[desc.cat] = n == 1
+                end
+            end,
+            Info = { getMCMDes(desc.tooltip) },
+        })
     end
 end
