@@ -41,9 +41,9 @@ local flipYCache = {}
 ----------------------------------------------------------------------------
 
 local function isEntityIncluded(entity)
-    if not mod.setting[Category.MASTER] then
-        return false
-    end
+    -- if not mod.setting[Category.MASTER] then
+    --     return false
+    -- end
 
     if mod.setting[Category.NORMAL] then
         if entity:IsVulnerableEnemy()
@@ -274,7 +274,7 @@ local FC_MCM = {
     zh = {
         MN = "物影错置",
         ST = "\232\174\190\231\189\174",
-        N0 = "\230\128\187\229\188\128\229\133\179: ",
+        N0 = "\228\184\128\233\148\174\232\174\190\231\189\174: ",
         O0 = { "\229\133\179", "\229\188\128" },
         K0 = "\228\184\128\233\148\174\229\188\128\229\144\175/229\133\179\233\151\173\230\137\128\230\156\137\229\174\158\228\189\147",
         N1 = "\230\153\174\233\128\154\230\128\170\231\137\169: ",
@@ -296,7 +296,7 @@ local FC_MCM = {
     en = {
         MN = "Skin Shuffle",
         ST = "Settings",
-        N0 = "Master Switch: ",
+        N0 = "One-Click Setup: ",
         O0 = { "OFF", "ON" },
         K0 = "Toggle all entity types on/off",
         N1 = "Normal Monsters: ",
