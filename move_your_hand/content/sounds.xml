@@ -1,0 +1,5 @@
+<sounds root="sfx/">
+    <sound name="din">
+        <sample weight="1" path="din.wav" />
+    </sound>
+</sounds>
