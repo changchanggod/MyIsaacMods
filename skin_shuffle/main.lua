@@ -201,18 +201,40 @@ function mod:onNpcUpdate(npc)
         local x = offset.X
         local y = offset.Y
         if prevFlipX ~= npc.FlipX then
-            x = -x
-            if npc.FlipX then
-                x = x / (npc.SpriteScale.X * 2 - 1)
-            end
-        end
-        if spr.FlipY then
-            if x > 0 then
-                x = x - 2 * y
+            if npc.SpriteRotation==180 then
+                if npc.FlipX then
+                    x=x/3
+                    x=x/ (4.3710*npc.SpriteScale.X+1.4348)*5.85
+                else
+                    x=x*(4.3710*npc.SpriteScale.X+1.4348)/5.85
+                    x=x*3
+                end
+                
             else
-                x = x + 2 * y
+                 x = -x
+                if npc.FlipX then
+                    x = x / (npc.SpriteScale.X * 2 - 1)
+                end
+            end
+           
+            
+        end
+        if prevFlipY~=spr.FlipY then
+            if spr.FlipY then
+                if npc.SpriteRotation==-90 then
+                    x = x - 2 * y*npc.SpriteScale.X
+                else
+                    x = x + 2 * y*npc.SpriteScale.X
+                end
+            else
+                if npc.SpriteRotation==-90 then
+                    x = x + 2 * y*npc.SpriteScale.X
+                else
+                    x = x - 2 * y*npc.SpriteScale.X
+                end
             end
         end
+        
         npc.SpriteOffset = Vector(x, y)
     end
 end
@@ -241,14 +263,19 @@ function mod:onNpcRender(npc, _)
     local dx = round2(tgtPos.X - npc.Position.X)
     local dy = round2(tgtPos.Y - npc.Position.Y)
     if npc.FlipX then
-        dx = -dx / (npc.SpriteScale.X*2-1)
+        if npc.SpriteRotation==180 then
+            dx=dx/3
+            dx=dx/ (4.3710*npc.SpriteScale.X+1.4348)*5.85
+        else
+            dx = -dx / (npc.SpriteScale.X*2-1)
+        end
     end
     local spr=npc:GetSprite()
     if spr.FlipY then
-        if dx>0 then
-            dx=dx-2*dy
+        if npc.SpriteRotation==-90 then
+            dx=dx-2*dy*npc.SpriteScale.X
         else
-            dx=dx+2*dy
+            dx=dx+2*dy*npc.SpriteScale.X
         end
     end
     npc.SpriteOffset = Vector(dx, dy)*fixArgs
@@ -370,4 +397,8 @@ if ModConfigMenu and mod.setting then
     end
 end
 
--- l Isaac.Spawn(240,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
+-- l local ent=Isaac.Spawn(241,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
+-- function mod:makeAllChampion(EntNPC)
+--     EntNPC:MakeChampion(1,13,true)
+-- end
+-- mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT,mod.makeAllChampion)
