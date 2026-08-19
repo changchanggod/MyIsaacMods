@@ -1,0 +1,4 @@
+<items gfxroot="gfx/items/" version="1">
+    <passive id="32026711" name="blood debt" gfx="bad_shit.png" description="pay for the death of your enemy"
+        quality="0" hidden="true" craftquality="-1" />
+</items>

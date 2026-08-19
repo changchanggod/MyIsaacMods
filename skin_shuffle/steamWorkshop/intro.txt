@@ -1,9 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<metadata>
-    <name>skin shuffle</name>
-    <directory>skin_shuffle</directory>
-    <id>3781670547</id>
-    <description>[h1]Skin Shuffle[/h1]
+[h1]Skin Shuffle[/h1]
 [h2]What It Does[/h2]
 Randomly shuffles the sprite positions of room entities, creating visual chaos. Each entity's sprite is rendered at another entity's location.
 
@@ -27,11 +22,5 @@ Randomly shuffles the sprite positions of room entities, creating visual chaos. 
 
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2812798412]Binding of Chaos[/url] is also recommended to play with.
 
-[h3]Bug Reports &amp; Feedback[/h3]
-If you run into any bugs, feel free to leave a comment below, or submit an issue on my [url=https://github.com/changchanggod/MyIsaacMods]GitHub repository[/url]. All feedback is appreciated.</description>
-    <version>1.2</version>
-    <visibility>Public</visibility>
-    <tag id="Lua"/>
-    <tag id="Enemies"/>
-    <tag id="Bosses"/>
-</metadata>
+[h3]Bug Reports & Feedback[/h3]
+If you run into any bugs, feel free to leave a comment below, or submit an issue on my [url=https://github.com/changchanggod/MyIsaacMods]GitHub repository[/url]. All feedback is appreciated.

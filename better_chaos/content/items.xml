@@ -1,0 +1,6 @@
+<items gfxroot="gfx/items/" version="1">
+    <passive id="32026711" name="intro" gfx="bad_shit.png" description="introduction"
+        quality="0" hidden="true" craftquality="-1" />
+    <passive id="32026711" name="intro2" gfx="bad_shit.png" description="introduction"
+        quality="0" hidden="true" craftquality="-1" />
+</items>

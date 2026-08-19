@@ -1,0 +1,26 @@
+[h1]贴图洗牌[/h1]
+[h2]模组功能[/h2]
+随机打乱房间实体的精灵贴图位置，制造视觉混乱。每一个实体会套用其他实体对应的贴图进行渲染。
+
+[h2]功能特性[/h2]
+[list]
+[*]随机错排映射，不存在实体沿用自身贴图
+[*]实体死亡后贴图连锁继承
+[*]可通过模组配置菜单自定义设置，挑选参与置换的实体种类
+[/list]
+
+[h2]可设置的实体类型[/h2]
+[list]
+[*]普通怪物
+[*]首领Boss
+[*]掉落拾取物
+[*]友方怪物
+[*]无敌陷阱
+[/list]
+
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=2494192799]模组配置菜单[/url] 推荐用于游戏内参数调整。
+
+也推荐搭配 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2812798412]随机怪物模组[/url] 模组进行游玩。
+
+[h3]反馈与BUG提交[/h3]
+遇到BUG可在评论区留言反馈，也可前往我的 [url=https://github.com/changchanggod/MyIsaacMods]GitHub仓库[/url] 提交Issue，欢迎各位提出建议。

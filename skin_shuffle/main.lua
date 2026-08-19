@@ -369,3 +369,5 @@ if ModConfigMenu and mod.setting then
         })
     end
 end
+
+-- l Isaac.Spawn(240,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
