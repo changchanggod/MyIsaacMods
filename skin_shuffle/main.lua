@@ -39,12 +39,20 @@ local flipYCache = {}
 ----------------------------------------------------------------------------
 -- Entity Category Check
 ----------------------------------------------------------------------------
-
+---@param entity Entity
 local function isEntityIncluded(entity)
-    -- if not mod.setting[Category.MASTER] then
-    --     return false
-    -- end
-
+    if entity.Type==35 and entity.Variant==10 then  --大嘴头尸的脖子 (Mr. Maw Neck)
+        return false
+    end
+    if entity.Type==311 and entity.Variant==10 then  --水雷头的脖子 (Mr. Mine Neck)
+        return false
+    end
+    if entity.Type==216 and entity.Variant==10 then  --甩头尸的脖子 (Swinger Neck)
+        return false
+    end
+    if entity.Type==237 or entity.Type==55 then  --TODO 修复动画闪现问题
+        return false
+    end
     if mod.setting[Category.NORMAL] then
         if entity:IsVulnerableEnemy()
             and not entity:IsBoss()
@@ -397,7 +405,7 @@ if ModConfigMenu and mod.setting then
     end
 end
 
--- l local ent=Isaac.Spawn(241,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
+-- l local ent=Isaac.Spawn(55,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
 -- function mod:makeAllChampion(EntNPC)
 --     EntNPC:MakeChampion(1,13,true)
 -- end
