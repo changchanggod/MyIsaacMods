@@ -33,6 +33,7 @@ end
 
 local mapping = {}
 local entityPosCache = {}
+local entityOffsetCache = {}
 local flipXCache = {}
 local flipYCache = {}
 
@@ -48,9 +49,6 @@ local function isEntityIncluded(entity)
         return false
     end
     if entity.Type==216 and entity.Variant==10 then  --甩头尸的脖子 (Swinger Neck)
-        return false
-    end
-    if entity.Type==237 or entity.Type==55 then  --TODO 修复动画闪现问题
         return false
     end
     if mod.setting[Category.NORMAL] then
@@ -129,7 +127,9 @@ function mod:onNewRoom()
         mapping[included[i]] = included[(i % n) + 1]
     end
     entityPosCache = {}
+    entityOffsetCache = {}
     flipXCache = {}
+    flipYCache = {}
 end
 
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
@@ -183,13 +183,24 @@ local function round2(v)
     return math.floor(v * 100 + 0.5) * 0.01
 end
 
+---@param npc EntityNPC
 function mod:onNpcUpdate(npc)
+
     if next(mapping) == nil then
         return
     end
 
     if not mapping[npc.Index] then
         return
+    end
+
+    if npc.Type==23 and npc.Variant==2 then
+        if entityOffsetCache[npc.Index] then
+            npc.SpriteOffset=entityOffsetCache[npc.Index]
+        end
+    end
+    if entityOffsetCache[npc.Index] then
+        npc.SpriteOffset=entityOffsetCache[npc.Index]
     end
 
     local spr = npc:GetSprite()
@@ -244,6 +255,7 @@ function mod:onNpcUpdate(npc)
         end
         
         npc.SpriteOffset = Vector(x, y)
+
     end
 end
 
@@ -253,7 +265,7 @@ mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
 -- NPC Render: Apply SpriteOffset per NPC
 ----------------------------------------------------------------------------
 ---@param npc  EntityNPC
-function mod:onNpcRender(npc, _)
+function mod:updateSprOffset(npc, _)
     if next(mapping) == nil then
         return
     end
@@ -287,9 +299,10 @@ function mod:onNpcRender(npc, _)
         end
     end
     npc.SpriteOffset = Vector(dx, dy)*fixArgs
+    entityOffsetCache[npc.Index]=Vector(npc.SpriteOffset.X,npc.SpriteOffset.Y)
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.onNpcRender)
+mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.updateSprOffset)
 
 ----------------------------------------------------------------------------
 -- Save
@@ -405,7 +418,7 @@ if ModConfigMenu and mod.setting then
     end
 end
 
--- l local ent=Isaac.Spawn(55,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
+-- l local ent=Isaac.Spawn(237,0,0,(Isaac.GetPlayer()).Position,Vector.Zero,nil)
 -- function mod:makeAllChampion(EntNPC)
 --     EntNPC:MakeChampion(1,13,true)
 -- end
