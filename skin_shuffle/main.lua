@@ -187,18 +187,15 @@ end
 function mod:onNpcUpdate(npc)
 
     if next(mapping) == nil then
+        npc.SpriteOffset=Vector.Zero
         return
     end
 
     if not mapping[npc.Index] then
+        npc.SpriteOffset=Vector.Zero
         return
     end
 
-    if npc.Type==23 and npc.Variant==2 then
-        if entityOffsetCache[npc.Index] then
-            npc.SpriteOffset=entityOffsetCache[npc.Index]
-        end
-    end
     if entityOffsetCache[npc.Index] then
         npc.SpriteOffset=entityOffsetCache[npc.Index]
     end
@@ -267,16 +264,19 @@ mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
 ---@param npc  EntityNPC
 function mod:updateSprOffset(npc, _)
     if next(mapping) == nil then
+        npc.SpriteOffset=Vector.Zero
         return
     end
 
     local tgtIdx = mapping[npc.Index]
     if not tgtIdx then
+        npc.SpriteOffset=Vector.Zero
         return
     end
 
     local tgtPos = entityPosCache[tgtIdx]
     if not tgtPos then
+        npc.SpriteOffset=Vector.Zero
         return
     end
 
