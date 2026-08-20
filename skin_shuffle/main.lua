@@ -51,6 +51,18 @@ local function isEntityIncluded(entity)
     if entity.Type==216 and entity.Variant==10 then  --甩头尸的脖子 (Swinger Neck)
         return false
     end
+    if entity.Type==251 and entity.Variant==10 then  --受生恶魔的锁链 (Begotten Chain)
+        return false
+    end
+    if entity.Type==903 and entity.Variant==10 then  --锁链假面的锁链 (Visage Chain)
+        return false
+    end
+    if entity.Type==228 and entity.Variant==10 then  --畸婴的脐带 (Homunculus Cord)
+        return false
+    end
+    if entity.Type==79 and entity.Variant==20 then  --连体双子的脐带 (Umbilical Cord)
+        return false
+    end
     if mod.setting[Category.NORMAL] then
         if entity:IsVulnerableEnemy()
             and not entity:IsBoss()
