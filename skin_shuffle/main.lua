@@ -274,7 +274,7 @@ mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
 -- NPC Render: Apply SpriteOffset per NPC
 ----------------------------------------------------------------------------
 ---@param npc  EntityNPC
-function mod:updateSprOffset(npc, _)
+function mod:updateNPCSprOffset(npc, _)
     if next(mapping) == nil then
         npc.SpriteOffset=Vector.Zero
         return
@@ -314,7 +314,49 @@ function mod:updateSprOffset(npc, _)
     entityOffsetCache[npc.Index]=Vector(npc.SpriteOffset.X,npc.SpriteOffset.Y)
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.updateSprOffset)
+mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.updateNPCSprOffset)
+
+---@param EntityPick EntityPickup
+function mod:updatePickupSprOffset(EntityPick,_)
+    if next(mapping) == nil then
+        EntityPick.SpriteOffset=Vector.Zero
+        return
+    end
+
+    local tgtIdx = mapping[EntityPick.Index]
+    if not tgtIdx then
+        EntityPick.SpriteOffset=Vector.Zero
+        return
+    end
+
+    local tgtPos = entityPosCache[tgtIdx]
+    if not tgtPos then
+        EntityPick.SpriteOffset=Vector.Zero
+        return
+    end
+
+    local dx = round2(tgtPos.X - EntityPick.Position.X)
+    local dy = round2(tgtPos.Y - EntityPick.Position.Y)
+    -- if npc.FlipX then
+    --     if npc.SpriteRotation==180 then
+    --         dx=dx/3
+    --         dx=dx/ (4.3710*npc.SpriteScale.X+1.4348)*5.85
+    --     else
+    --         dx = -dx / (npc.SpriteScale.X*2-1)
+    --     end
+    -- end
+    -- local spr=npc:GetSprite()
+    -- if spr.FlipY then
+    --     if npc.SpriteRotation==-90 then
+    --         dx=dx-2*dy*npc.SpriteScale.X
+    --     else
+    --         dx=dx+2*dy*npc.SpriteScale.X
+    --     end
+    -- end
+    EntityPick.SpriteOffset = Vector(dx, dy)*fixArgs
+    entityOffsetCache[EntityPick.Index]=Vector(EntityPick.SpriteOffset.X,EntityPick.SpriteOffset.Y)
+end
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_RENDER, mod.updatePickupSprOffset)
 
 ----------------------------------------------------------------------------
 -- Save
