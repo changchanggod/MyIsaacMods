@@ -1,6 +1,7 @@
 local mod = RegisterMod("Fading Remnants", 1)
 local json = require("json")
 local eternalChestFrame = 55
+local hasFlip=false
 local chestVariant = {
     [PickupVariant.PICKUP_CHEST] = true,
     [PickupVariant.PICKUP_BOMBCHEST] = true,
@@ -127,7 +128,17 @@ local function removeChest(EntPick)
 end
 ---@param EntPick  EntityPickup
 function mod:fadeChest(EntPick)
+    local player=Isaac.GetPlayer()
     local isItem = EntPick.Variant == 100
+    if isItem and hasFlip then
+        if REPENTOGON then
+            if EntPick:GetFlipCollectible() then
+                return
+            end
+        else
+            return
+        end
+    end
     if chestVariant[EntPick.Variant] or isItem then
         if EntPick.SubType == ChestSubType.CHEST_OPENED then --ChestSubType.CHEST_OPENED=0. when pickup is an item, subType=0 means empty, so they are the same situations
             if isInFadeDelay(EntPick) then
@@ -195,6 +206,21 @@ function mod:fadeSlotMachine()
 end
 
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.fadeSlotMachine)
+
+function mod:isEnterRoomWithFlip()
+    hasFlip=Isaac.GetPlayer():HasCollectible(CollectibleType.COLLECTIBLE_FLIP,true)
+    if not hasFlip then
+        local roomEntities = Isaac.GetRoomEntities()
+        for i = 1, #roomEntities do
+            local entity = roomEntities[i]
+            if entity.Type==EntityType.ENTITY_PICKUP and entity.Variant==PickupVariant.PICKUP_COLLECTIBLE and entity.SubType==CollectibleType.COLLECTIBLE_FLIP then
+                hasFlip=true
+                break
+            end
+        end
+    end
+end
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,mod.isEnterRoomWithFlip)
 
 function mod:clearTable()
     fadeDelay = {}
