@@ -1,5 +1,4 @@
 local mod=CCG_VS_YSD
-local challengeName="挑战2"
 ---@param EntNPC EntityNPC
 local function TLH_enemy_champion13(_,EntNPC)
     EntNPC:MakeChampion (EntNPC.InitSeed,13,true)
@@ -86,7 +85,7 @@ end
 
 
 if ModConfigMenu then
-    ModConfigMenu.AddSetting(mod.Name,challengeName, {
+    ModConfigMenu.AddSetting(mod.Name,mod.Des, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
             return mod.Data.TLH_on
