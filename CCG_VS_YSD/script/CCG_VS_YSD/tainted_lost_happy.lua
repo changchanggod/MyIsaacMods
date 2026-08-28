@@ -86,15 +86,13 @@ end
 
 
 if ModConfigMenu then
-    ModConfigMenu.RemoveSubcategory(mod.Name,challengeName )
-    ModConfigMenu.AddTitle(mod.Name,challengeName, "里罗快乐挑战")
     ModConfigMenu.AddSetting(mod.Name,challengeName, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
             return mod.Data.TLH_on
         end,
         Display = function()
-            return "总开关:"..tostring(mod.Data.TLH_on)
+            return "里罗快乐挑战:"..tostring(mod.Data.TLH_on)
         end,
         OnChange = function(boolean)
             if mod.Data.TLH_on~=boolean then

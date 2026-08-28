@@ -62,15 +62,13 @@ end
 
 
 if ModConfigMenu then
-    ModConfigMenu.RemoveSubcategory(mod.Name,challengeName )
-    ModConfigMenu.AddTitle(mod.Name,challengeName, "飞骨流骨哥")
     ModConfigMenu.AddSetting(mod.Name,challengeName, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
             return mod.Data.FBC_on
         end,
         Display = function()
-            return "总开关:"..tostring(mod.Data.FBC_on)
+            return "飞骨流骨哥:"..tostring(mod.Data.FBC_on)
         end,
         OnChange = function(boolean)
             if mod.Data.FBC_on~=boolean then
