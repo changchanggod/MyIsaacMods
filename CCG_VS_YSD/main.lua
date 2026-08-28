@@ -18,4 +18,4 @@ end
 include("script.CCG_VS_YSD.force_YSD")
 include("script.CCG_VS_YSD.fly_bone_club")
 include("script.CCG_VS_YSD.tainted_lost_happy")
-
+include("script.CCG_VS_YSD.sin_attribute")
