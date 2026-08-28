@@ -1,5 +1,4 @@
 local mod=CCG_VS_YSD
-local challengeName="挑战1"
 ---@param EntP EntityPlayer
 local function FBC_not_allow_soulHeart(_,EntP)
     if EntP:GetPlayerType()==PlayerType.PLAYER_THEFORGOTTEN then
@@ -77,6 +76,6 @@ if ModConfigMenu then
             end
             
         end,
-        Info = { "无法使用灵魂形态，但部分属性上升" }
+        Info = { "无法使用灵魂形态 但部分属性上升" }
     })
 end

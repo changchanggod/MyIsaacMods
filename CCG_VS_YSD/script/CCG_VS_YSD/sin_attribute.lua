@@ -1,5 +1,4 @@
 local mod=CCG_VS_YSD
-local challengeName="挑战1"
 local sin_param={}
 local entP_attribute={}
 ---@param EntP EntityPlayer
