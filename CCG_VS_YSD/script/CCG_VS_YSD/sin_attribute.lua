@@ -17,7 +17,7 @@ local function SA_set_sin_attribute(_,EntP,CF)
         entP_attribute["ShotSpeed"] = EntP.ShotSpeed
     end
     if CF==CacheFlag.CACHE_SPEED and sin_param["Speed"] then
-        entP_attribute["Speed"] = EntP.MoveSpeed
+        entP_attribute["Speed"] = math.min(EntP.MoveSpeed,2)
     end
     if CF==CacheFlag.CACHE_FIREDELAY and sin_param["MaxFiredDelay"] then
         entP_attribute["MaxFiredDelay"] = EntP.MaxFireDelay
@@ -35,8 +35,8 @@ local function SA_set_sin_param()
 
     --######################## 【用户自行修改随机范围】########################
     -- frequency：震荡频率，数值越大属性波动越快；建议小数 0.01 ~ 0.15
-    local freq_min = 0.001
-    local freq_max = 0.005
+    local freq_min = 0.002
+    local freq_max = 0.01
 
     -- offset：正弦相位偏移，推荐 0 ~ 2*math.pi（完整正弦周期），让各属性波峰波谷错开
     local offset_min = 0
@@ -78,22 +78,23 @@ local function SA_enable_sin_attribute()
     local player = Isaac.GetPlayer()
     local EntP = player
     if sin_param["Damage"] and entP_attribute["Damage"] then
-        EntP.Damage = entP_attribute["Damage"] * (0.5 + 0.5*math.sin(sin_param["Damage"]["frequency"] * EntP.FrameCount + sin_param["Damage"]["offset"]))
+        EntP.Damage = entP_attribute["Damage"] * (1 + math.sin(sin_param["Damage"]["frequency"] * EntP.FrameCount + sin_param["Damage"]["offset"]))
     end
     if sin_param["Range"] and entP_attribute["Range"] then
-        EntP.TearRange = entP_attribute["Range"] * (0.5 + 0.5*math.sin(sin_param["Range"]["frequency"] * EntP.FrameCount + sin_param["Range"]["offset"]))
+        EntP.TearRange = entP_attribute["Range"] * (1 + math.sin(sin_param["Range"]["frequency"] * EntP.FrameCount + sin_param["Range"]["offset"]))
     end
     if sin_param["Luck"] and entP_attribute["Luck"] then
-        EntP.Luck = entP_attribute["Luck"] * (0 + 1*math.sin(sin_param["Luck"]["frequency"] * EntP.FrameCount + sin_param["Luck"]["offset"]))
+        EntP.Luck = entP_attribute["Luck"] * (math.sin(sin_param["Luck"]["frequency"] * EntP.FrameCount + sin_param["Luck"]["offset"]))
     end
     if sin_param["ShotSpeed"] and entP_attribute["ShotSpeed"] then
-        EntP.ShotSpeed = entP_attribute["ShotSpeed"] * (0 + 1*math.sin(sin_param["ShotSpeed"]["frequency"] * EntP.FrameCount + sin_param["ShotSpeed"]["offset"]))
+        EntP.ShotSpeed = entP_attribute["ShotSpeed"] * (math.sin(sin_param["ShotSpeed"]["frequency"] * EntP.FrameCount + sin_param["ShotSpeed"]["offset"]))
     end
     if sin_param["Speed"] and entP_attribute["Speed"] then
-        EntP.MoveSpeed = entP_attribute["Speed"] * (0.5 + 0.5*math.sin(sin_param["Speed"]["frequency"] * EntP.FrameCount + sin_param["Speed"]["offset"]))
+        EntP.MoveSpeed = entP_attribute["Speed"] * (1+math.sin(sin_param["Speed"]["frequency"] * EntP.FrameCount + sin_param["Speed"]["offset"]))
+        EntP.MoveSpeed=math.max(EntP.MoveSpeed,0.1)
     end
     if sin_param["MaxFiredDelay"] and entP_attribute["MaxFiredDelay"] then
-        EntP.MaxFireDelay = entP_attribute["MaxFiredDelay"] * (1.5 + 0.5*math.sin(sin_param["MaxFiredDelay"]["frequency"] * EntP.FrameCount + sin_param["MaxFiredDelay"]["offset"]))
+        EntP.MaxFireDelay = entP_attribute["MaxFiredDelay"] * (1.25 +0.75*math.sin(sin_param["MaxFiredDelay"]["frequency"] * EntP.FrameCount + sin_param["MaxFiredDelay"]["offset"]))
     end
 end
 
