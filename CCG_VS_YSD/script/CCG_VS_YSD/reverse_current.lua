@@ -3,23 +3,70 @@ local mod=CCG_VS_YSD
 local RC_room_seed=-1
 local RC_room_index=-1
 
+-- 仅映射敌方投射物存在对应行为的泪弹特效
 local RC_tear_to_projectile_flag={
     { TearFlags.TEAR_HOMING,ProjectileFlags.SMART },
-    { TearFlags.TEAR_SLOW,ProjectileFlags.SLOWED },
-    { TearFlags.TEAR_WIGGLE,ProjectileFlags.WIGGLE },
-    { TearFlags.TEAR_BOOMERANG,ProjectileFlags.BOOMERANG },
     { TearFlags.TEAR_EXPLOSIVE,ProjectileFlags.EXPLODE },
-    { TearFlags.TEAR_BOUNCE,ProjectileFlags.BOUNCE },
-    { TearFlags.TEAR_CONTINUUM,ProjectileFlags.CONTINUUM },
-    { TearFlags.TEAR_SHIELDED,ProjectileFlags.SHIELDED },
-    { TearFlags.TEAR_GLOW,ProjectileFlags.GODHEAD },
     { TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.ACID_GREEN },
-   -- { TearFlags.TEAR_ACID,ProjectileFlags.ACID_GREEN },
-    --{ TearFlags.TEAR_LASERSHOT,ProjectileFlags.LASER_SHOT },
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.GOO }, --无对应
+    --{ TearFlags.TEAR_SPECTRAL,ProjectileFlags.GHOST }, --特判
+    --{ TearFlags.TEAR_WIGGLE,ProjectileFlags.WIGGLE },  --被MEGA_WIGGLE覆盖
+    --{ TearFlags.TEAR_BOOMERANG,ProjectileFlags.BOOMERANG }, --未见效果
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.HIT_ENEMIES }, --无意义
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.ACID_RED }, --无对应
+    { TearFlags.TEAR_GREED_COIN,ProjectileFlags.GREED },
+    { TearFlags.TEAR_COIN_DROP,ProjectileFlags.GREED },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.RED_CREEP},--无对应
+    --{ TearFlags.TEAR_BOUNCE,ProjectileFlags.	ORBIT_CW}, --TODO
+    --{ TearFlags.TEAR_BOUNCE,ProjectileFlags.	ORBIT_CWW}, --TODO
+    --{ TearFlags.TEAR_SPECTRAL,ProjectileFlags.NO_WALL_COLLIDE }, --特判
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CREEP_BROWN},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FIRE},--未见效果
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ANY_HEIGHT_ENTITY_HIT},--已包括
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CURVE_LEFT},--TODO
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CURVE_RIGHT},--TODO
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.TURN_HORIZONTAL},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SINE_VELOCITY},--无对应
+    { TearFlags.TEAR_WIGGLE,ProjectileFlags.MEGA_WIGGLE },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SAWTOOTH_WIGGLE},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SLOWED},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.TRIANGLE},--无对应
+    --{ TearFlags.TEAR_BOOMERANG,ProjectileFlags.MOVE_TO_PARENT}, --未见效果
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ACCELERATE},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.DECELERATE},--无对应
+    --{ TearFlags.TEAR_BOOMERANG,ProjectileFlags.BURST3}, --未见效果
+    { TearFlags.TEAR_CONTINUUM,ProjectileFlags.CONTINUUM },
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.CANT_HIT_PLAYER }, --无意义
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.CHANGE_FLAGS_AFTER_TIMEOUT }, --无意义
+    --{ TearFlags.TEAR_MYSTERIOUS_LIQUID_CREEP,ProjectileFlags.CHANGE_VELOCITY_AFTER_TIMEOUT }, --无意义
+    --{ TearFlags.TEAR_BOUNCE,ProjectileFlags.	STASIS}, --TODO 反重力
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FIRE_WAVE},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FIRE_WAVE_X},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ACCELERATE_EX},--无对应
+    { TearFlags.TEAR_ABSORB,ProjectileFlags.BURST8},
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FIRE_SPAWN},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ANTI_GRAVITY},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.TRACTOR_BEAM},--未见效果
+    { TearFlags.TEAR_BOUNCE,ProjectileFlags.BOUNCE },
+    { TearFlags.TEAR_BOUNCE_WALLSONLY,ProjectileFlags.BOUNCE },
     { TearFlags.TEAR_HYDROBOUNCE,ProjectileFlags.BOUNCE_FLOOR },
-    --{ TearFlags.TEAR_BURSTSPLIT,ProjectileFlags.BURSTSPLIT },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SHIELDED},--未见效果
+    { TearFlags.TEAR_SHIELDED,ProjectileFlags.SHIELDED },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.BLUE_FIRE_SPAWN},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.LASER_SHOT},--未见效果
+    { TearFlags.TEAR_LASERSHOT,ProjectileFlags.LASER_SHOT },
+    { TearFlags.TEAR_GLOW,ProjectileFlags.GODHEAD },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SMART_PERFECT},--无对应
+    { TearFlags.TEAR_BURSTSPLIT,ProjectileFlags.BURSTSPLIT },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.WIGGLE_ROTGUT},--无对应
     { TearFlags.TEAR_FREEZE,ProjectileFlags.FREEZE },
     { TearFlags.TEAR_ICE,ProjectileFlags.FREEZE },
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ACCELERATE_TO_POSITION},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.BROCCOLI},--未见效果
+    {TearFlags.TEAR_SPLIT, ProjectileFlags.BACKSPLIT},
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.SIDEWAVE},--无对应
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ORBIT_PARENT},--未见效果
+    --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FADEOUT},--无对应
     { TearFlags.TEAR_TURN_HORIZONTAL,ProjectileFlags.TURN_HORIZONTAL },
     { TearFlags.TEAR_ACCELERATE,ProjectileFlags.ACCELERATE },
     { TearFlags.TEAR_DECELERATE,ProjectileFlags.DECELERATE }
@@ -88,13 +135,17 @@ local function RC_spawn_echo(EntT)
         position=data.RC_last_position-velocity:Normalized()*4
     end
     local echo=Isaac.Spawn(EntityType.ENTITY_PROJECTILE,ProjectileVariant.PROJECTILE_TEAR,0,position,velocity*-1,nil):ToProjectile()
-    echo.Damage=1
-    echo.Scale=data.RC_scale
-    echo.Height=data.RC_height
-    echo.FallingSpeed=data.RC_falling_speed
-    echo.FallingAccel=data.RC_falling_acceleration
-    echo.Color=data.RC_color
-    RC_copy_projectile_flags(data,echo)
+    if echo~=nil then
+        echo.Damage=1
+        echo.Scale=data.RC_scale
+        echo.Height=data.RC_height
+        echo.FallingSpeed=data.RC_falling_speed
+        echo.FallingAccel=data.RC_falling_acceleration
+        echo.Color=data.RC_color
+        echo:AddProjectileFlags(ProjectileFlags.ANY_HEIGHT_ENTITY_HIT)
+        RC_copy_projectile_flags(data,echo)
+    end
+    
 end
 
 ---@param Ent Entity
