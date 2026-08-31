@@ -72,6 +72,39 @@ local RC_tear_to_projectile_flag={
     { TearFlags.TEAR_DECELERATE,ProjectileFlags.DECELERATE }
 }
 
+-- 会将主攻击改为非普通泪弹，或额外叠加非泪弹主攻击的道具
+local RC_remove_attack_item={
+    CollectibleType.COLLECTIBLE_MOMS_KNIFE,
+    CollectibleType.COLLECTIBLE_BRIMSTONE,
+    CollectibleType.COLLECTIBLE_TECHNOLOGY,
+    CollectibleType.COLLECTIBLE_TECHNOLOGY_2,
+    CollectibleType.COLLECTIBLE_TECH_5,
+    CollectibleType.COLLECTIBLE_TECH_X,
+    CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE,
+    CollectibleType.COLLECTIBLE_RED_CANDLE,
+    CollectibleType.COLLECTIBLE_CANDLE,
+    CollectibleType.COLLECTIBLE_DR_FETUS,
+    CollectibleType.COLLECTIBLE_EPIC_FETUS,
+    CollectibleType.COLLECTIBLE_SPIRIT_SWORD,
+    CollectibleType.COLLECTIBLE_C_SECTION,
+    CollectibleType.COLLECTIBLE_SULFUR,
+    CollectibleType.COLLECTIBLE_MAW_OF_THE_VOID,
+    CollectibleType.COLLECTIBLE_REVELATION,
+    CollectibleType.COLLECTIBLE_SALVATION,
+    CollectibleType.COLLECTIBLE_URN_OF_SOULS,
+    CollectibleType.COLLECTIBLE_BERSERK,
+    CollectibleType.COLLECTIBLE_DARK_ARTS,
+    CollectibleType.COLLECTIBLE_MEGA_BLAST,
+    CollectibleType.COLLECTIBLE_LARYNX
+}
+
+local function RC_remove_attack_item_from_pool()
+    local item_pool=Game():GetItemPool()
+    for _,item_id in pairs(RC_remove_attack_item) do
+        item_pool:RemoveCollectible(item_id)
+    end
+end
+
 local function RC_set_room_info()
     local room=Game():GetRoom()
     RC_room_seed=room:GetSpawnSeed()
@@ -203,10 +236,12 @@ local function RC_tear_become_echo(_,Ent)
 end
 
 function mod:RC_on()
+    mod:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED,RC_remove_attack_item_from_pool)
     mod:RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM,RC_set_room_info)
     mod:RemoveCallback(ModCallbacks.MC_POST_FIRE_TEAR,RC_mark_tear)
     mod:RemoveCallback(ModCallbacks.MC_POST_TEAR_UPDATE,RC_update_tear)
     mod:RemoveCallback(ModCallbacks.MC_POST_ENTITY_REMOVE,RC_tear_become_echo)
+    mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED,RC_remove_attack_item_from_pool)
     mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,RC_set_room_info)
     mod:AddCallback(ModCallbacks.MC_POST_FIRE_TEAR,RC_mark_tear)
     mod:AddCallback(ModCallbacks.MC_POST_TEAR_UPDATE,RC_update_tear)
@@ -215,6 +250,7 @@ function mod:RC_on()
 end
 
 function mod:RC_off()
+    mod:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED,RC_remove_attack_item_from_pool)
     mod:RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM,RC_set_room_info)
     mod:RemoveCallback(ModCallbacks.MC_POST_FIRE_TEAR,RC_mark_tear)
     mod:RemoveCallback(ModCallbacks.MC_POST_TEAR_UPDATE,RC_update_tear)
