@@ -92,6 +92,13 @@ local function RC_mark_tear(_,EntT)
     data.RC_falling_acceleration=EntT.FallingAcceleration
     data.RC_color=EntT.Color
     data.RC_spectral=EntT:HasTearFlags(TearFlags.TEAR_SPECTRAL)
+    data.RC_tiny_planet=EntT:HasTearFlags(TearFlags.TEAR_ORBIT)
+        or EntT:HasTearFlags(TearFlags.TEAR_ORBIT_ADVANCED)
+    data.RC_orbit_curve_flag=ProjectileFlags.CURVE_LEFT
+    local owner=EntT.SpawnerEntity and EntT.SpawnerEntity:ToPlayer()
+    if owner then
+        data.RC_owner_index=owner.Index
+    end
     data.RC_projectile_flags={}
     for _,flag in pairs(RC_tear_to_projectile_flag) do
         if EntT:HasTearFlags(flag[1]) then
@@ -105,6 +112,16 @@ local function RC_update_tear(_,EntT)
     local data=EntT:GetData()
     if not data.RC_echo_source then
         return
+    end
+    if data.RC_tiny_planet and data.RC_owner_index then
+        local owner=Isaac.GetPlayer(data.RC_owner_index)
+        local offset=EntT.Position-owner.Position
+        local rotate_direction=offset.X*EntT.Velocity.Y-offset.Y*EntT.Velocity.X
+        if rotate_direction>0 then
+            data.RC_orbit_curve_flag=ProjectileFlags.CURVE_LEFT
+        elseif rotate_direction<0 then
+            data.RC_orbit_curve_flag=ProjectileFlags.CURVE_RIGHT
+        end
     end
     if not data.RC_spectral and Game():GetRoom():GetGridCollisionAtPos(EntT.Position)==GridCollisionClass.COLLISION_NONE then
         data.RC_last_position=EntT.Position
@@ -123,6 +140,27 @@ local function RC_copy_projectile_flags(data,EntP)
     end
 end
 
+---@param position Vector
+---@param velocity Vector
+---@param data table
+---@param curve_flag ProjectileFlags
+local function RC_spawn_one_echo(position,velocity,data,curve_flag)
+    local echo=Isaac.Spawn(EntityType.ENTITY_PROJECTILE,ProjectileVariant.PROJECTILE_TEAR,0,position,velocity*-1,nil):ToProjectile()
+    if echo~=nil then
+        echo.Damage=1
+        echo.Scale=data.RC_scale
+        echo.Height=data.RC_height
+        echo.FallingSpeed=data.RC_falling_speed
+        echo.FallingAccel=data.RC_falling_acceleration
+        echo.Color=data.RC_color
+        echo:AddProjectileFlags(ProjectileFlags.ANY_HEIGHT_ENTITY_HIT)
+        RC_copy_projectile_flags(data,echo)
+        if curve_flag then
+            echo:AddProjectileFlags(curve_flag)
+        end
+    end
+end
+
 ---@param EntT EntityTear
 local function RC_spawn_echo(EntT)
     local data=EntT:GetData()
@@ -134,18 +172,11 @@ local function RC_spawn_echo(EntT)
     if not data.RC_spectral and Game():GetRoom():GetGridCollisionAtPos(position)~=GridCollisionClass.COLLISION_NONE then
         position=data.RC_last_position-velocity:Normalized()*4
     end
-    local echo=Isaac.Spawn(EntityType.ENTITY_PROJECTILE,ProjectileVariant.PROJECTILE_TEAR,0,position,velocity*-1,nil):ToProjectile()
-    if echo~=nil then
-        echo.Damage=1
-        echo.Scale=data.RC_scale
-        echo.Height=data.RC_height
-        echo.FallingSpeed=data.RC_falling_speed
-        echo.FallingAccel=data.RC_falling_acceleration
-        echo.Color=data.RC_color
-        echo:AddProjectileFlags(ProjectileFlags.ANY_HEIGHT_ENTITY_HIT)
-        RC_copy_projectile_flags(data,echo)
+    if data.RC_tiny_planet then
+        RC_spawn_one_echo(position,velocity,data,data.RC_orbit_curve_flag)
+    else
+        RC_spawn_one_echo(position,velocity,data,nil)
     end
-    
 end
 
 ---@param Ent Entity
