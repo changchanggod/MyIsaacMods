@@ -78,6 +78,13 @@ local function RC_set_room_info()
     RC_room_index=Game():GetLevel():GetCurrentRoomIndex()
 end
 
+local function RC_tear_can_pass_grid(position)
+    local collision=Game():GetRoom():GetGridCollisionAtPos(position)
+    return collision~=GridCollisionClass.COLLISION_SOLID
+        and collision~=GridCollisionClass.COLLISION_WALL
+        and collision~=GridCollisionClass.COLLISION_WALL_EXCEPT_PLAYER
+end
+
 ---@param EntT EntityTear
 local function RC_mark_tear(_,EntT)
     local data=EntT:GetData()
@@ -123,7 +130,7 @@ local function RC_update_tear(_,EntT)
             data.RC_orbit_curve_flag=ProjectileFlags.CURVE_RIGHT
         end
     end
-    if not data.RC_spectral and Game():GetRoom():GetGridCollisionAtPos(EntT.Position)==GridCollisionClass.COLLISION_NONE then
+    if not data.RC_spectral and RC_tear_can_pass_grid(EntT.Position) then
         data.RC_last_position=EntT.Position
     end
 end
@@ -143,7 +150,7 @@ end
 ---@param position Vector
 ---@param velocity Vector
 ---@param data table
----@param curve_flag ProjectileFlags
+---@param curve_flag ProjectileFlags|nil
 local function RC_spawn_one_echo(position,velocity,data,curve_flag)
     local echo=Isaac.Spawn(EntityType.ENTITY_PROJECTILE,ProjectileVariant.PROJECTILE_TEAR,0,position,velocity*-1,nil):ToProjectile()
     if echo~=nil then
@@ -169,8 +176,8 @@ local function RC_spawn_echo(EntT)
         return
     end
     local position=EntT.Position
-    if not data.RC_spectral and Game():GetRoom():GetGridCollisionAtPos(position)~=GridCollisionClass.COLLISION_NONE then
-        position=data.RC_last_position-velocity:Normalized()*4
+    if not data.RC_spectral and not RC_tear_can_pass_grid(position) then
+        position=data.RC_last_position
     end
     if data.RC_tiny_planet then
         RC_spawn_one_echo(position,velocity,data,data.RC_orbit_curve_flag)
