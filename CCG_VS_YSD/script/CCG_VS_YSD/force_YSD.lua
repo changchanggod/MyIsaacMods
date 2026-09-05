@@ -6,6 +6,18 @@ local taunt={
 }
 local taunt_enable=false
 local taunt_countDown=-1
+local donation_machine_variant=8
+local greed_donation_machine_variant=11
+
+local function avoid_donation_machine()
+    for _,slot in pairs(Isaac.FindByType(EntityType.ENTITY_SLOT,-1,-1,false,false)) do
+        if slot.Variant==donation_machine_variant
+        or slot.Variant==greed_donation_machine_variant then
+            slot:Remove()
+        end
+    end
+end
+
 local function players_has_item(item_id)
     local ind=0
     local checked={}
@@ -56,3 +68,5 @@ mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION,mod.avoid_Isaac_Satan_end,P
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION,mod.avoid_Isaac_Satan_end,PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,mod.taunt_enable)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE,mod.taunt)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM,avoid_donation_machine)
+mod:AddCallback(ModCallbacks.MC_POST_UPDATE,avoid_donation_machine)
