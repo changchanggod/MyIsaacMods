@@ -1,4 +1,5 @@
 local mod=CCG_VS_YSD
+local challenge_name="fly bone club"
 ---@param EntP EntityPlayer
 local function FBC_not_allow_soulHeart(_,EntP)
     if EntP:GetPlayerType()==PlayerType.PLAYER_THEFORGOTTEN then
@@ -47,12 +48,12 @@ end
 if mod.Data==nil then
     mod.Data={}
 end
-if mod.Data.FBC_on==nil then
-    mod.Data.FBC_on=false
+if mod.Data[challenge_name]==nil then
+    mod.Data[challenge_name]=false
 end
 
 local function reset_active()
-    if mod.Data.FBC_on then
+    if mod.Data[challenge_name] then
         mod:FBC_on()
     else
         mod:FBC_off()
@@ -64,14 +65,14 @@ if ModConfigMenu then
     ModConfigMenu.AddSetting(mod.Name,mod.Des, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
-            return mod.Data.FBC_on
+            return mod.Data[challenge_name]
         end,
         Display = function()
-            return "飞骨流骨哥:"..tostring(mod.Data.FBC_on)
+            return "飞骨流骨哥:"..tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
-            if mod.Data.FBC_on~=boolean then
-                mod.Data.FBC_on=boolean
+            if mod.Data[challenge_name]~=boolean then
+                mod.Data[challenge_name]=boolean
                 reset_active()
             end
             

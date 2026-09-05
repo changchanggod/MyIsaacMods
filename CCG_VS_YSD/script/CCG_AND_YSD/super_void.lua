@@ -1,5 +1,6 @@
 
 local mod=CCG_VS_YSD
+local challenge_name="super void"
 local function SV_one_charge(_)
     local config=Isaac.GetItemConfig():GetCollectible(CollectibleType.COLLECTIBLE_VOID)
     config.MaxCharges=1
@@ -16,12 +17,12 @@ end
 if mod.Data==nil then
     mod.Data={}
 end
-if mod.Data.SV_on==nil then
-    mod.Data.SV_on=false
+if mod.Data[challenge_name]==nil then
+    mod.Data[challenge_name]=false
 end
 
 local function reset_active()
-    if mod.Data.SV_on then
+    if mod.Data[challenge_name] then
         mod:SV_on()
     else
         mod:SV_off()
@@ -33,14 +34,14 @@ if ModConfigMenu then
     ModConfigMenu.AddSetting(mod.Name,mod.Sed, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
-            return mod.Data.SV_on
+            return mod.Data[challenge_name]
         end,
         Display = function()
-            return "超级虚空:"..tostring(mod.Data.SV_on)
+            return "超级虚空:"..tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
-            if mod.Data.SV_on~=boolean then
-                mod.Data.SV_on=boolean
+            if mod.Data[challenge_name]~=boolean then
+                mod.Data[challenge_name]=boolean
                 reset_active()
             end
             

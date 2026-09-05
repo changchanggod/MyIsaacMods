@@ -1,4 +1,5 @@
 local mod=CCG_VS_YSD
+local challenge_name="force YSD"
 local taunt={
     [1]="逃避虽然可耻 但是没用",
     [2]="略鸭不完全 相当于完全不略鸭",

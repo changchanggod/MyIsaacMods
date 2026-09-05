@@ -1,4 +1,5 @@
 local mod=CCG_VS_YSD
+local challenge_name="reverse current"
 
 local RC_room_seed=-1
 local RC_room_index=-1
@@ -262,12 +263,12 @@ end
 if mod.Data==nil then
     mod.Data={}
 end
-if mod.Data.RC_on==nil then
-    mod.Data.RC_on=false
+if mod.Data[challenge_name]==nil then
+    mod.Data[challenge_name]=false
 end
 
 local function reset_active()
-    if mod.Data.RC_on then
+    if mod.Data[challenge_name] then
         mod:RC_on()
     else
         mod:RC_off()
@@ -279,14 +280,14 @@ if ModConfigMenu then
     ModConfigMenu.AddSetting(mod.Name,mod.Des, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
-            return mod.Data.RC_on
+            return mod.Data[challenge_name]
         end,
         Display = function()
-            return "逆流而上:"..tostring(mod.Data.RC_on)
+            return "逆流而上:"..tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
-            if mod.Data.RC_on~=boolean then
-                mod.Data.RC_on=boolean
+            if mod.Data[challenge_name]~=boolean then
+                mod.Data[challenge_name]=boolean
                 reset_active()
             end
             

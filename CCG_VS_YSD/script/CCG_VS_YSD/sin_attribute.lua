@@ -1,4 +1,5 @@
 local mod=CCG_VS_YSD
+local challenge_name="sin attribute"
 local sin_param={}
 local entP_attribute={}
 ---@param EntP EntityPlayer
@@ -121,12 +122,12 @@ end
 if mod.Data==nil then
     mod.Data={}
 end
-if mod.Data.SA_on==nil then
-    mod.Data.SA_on=false
+if mod.Data[challenge_name]==nil then
+    mod.Data[challenge_name]=false
 end
 
 local function reset_active()
-    if mod.Data.SA_on then
+    if mod.Data[challenge_name] then
         mod:SA_on()
     else
         mod:SA_off()
@@ -138,14 +139,14 @@ if ModConfigMenu then
     ModConfigMenu.AddSetting(mod.Name,mod.Des, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
-            return mod.Data.SA_on
+            return mod.Data[challenge_name]
         end,
         Display = function()
-            return "正弦属性:"..tostring(mod.Data.SA_on)
+            return "正弦属性:"..tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
-            if mod.Data.SA_on~=boolean then
-                mod.Data.SA_on=boolean
+            if mod.Data[challenge_name]~=boolean then
+                mod.Data[challenge_name]=boolean
                 reset_active()
             end
             

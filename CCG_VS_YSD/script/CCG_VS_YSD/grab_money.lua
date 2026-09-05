@@ -1,4 +1,5 @@
 local mod=CCG_VS_YSD
+local challenge_name="grab money"
 ---@param entPick EntityPickup
 local function GM_quicker_disappear_money(_,entPick)
     if entPick.FrameCount==1 then
@@ -26,12 +27,12 @@ end
 if mod.Data==nil then
     mod.Data={}
 end
-if mod.Data.GM_on==nil then
-    mod.Data.GM_on=false
+if mod.Data[challenge_name]==nil then
+    mod.Data[challenge_name]=false
 end
 
 local function reset_active()
-    if mod.Data.GM_on then
+    if mod.Data[challenge_name] then
         mod:GM_on()
     else
         mod:GM_off()
@@ -43,14 +44,14 @@ if ModConfigMenu then
     ModConfigMenu.AddSetting(mod.Name,mod.Des, {
         Type = ModConfigMenu.OptionType.BOOLEAN,
         CurrentSetting = function()
-            return mod.Data.GM_on
+            return mod.Data[challenge_name]
         end,
         Display = function()
-            return "抢钱:"..tostring(mod.Data.GM_on)
+            return "抢钱:"..tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
-            if mod.Data.GM_on~=boolean then
-                mod.Data.GM_on=boolean
+            if mod.Data[challenge_name]~=boolean then
+                mod.Data[challenge_name]=boolean
                 reset_active()
             end
             
