@@ -6,6 +6,8 @@ local allowedCharacters = {}
 local allowedCharacterOrder = {}
 local blockedIsaacSatanEnds = {}
 local blockedDonationMachines = {}
+local dilutedNonPlayerTears = {}
+local removeItemsOnCollectibleSpawn = {}
 -- These were originally implemented by force_YSD.lua and apply globally.
 local alwaysBlockIsaacSatanEnd = true
 local alwaysBlockDonationMachines = true
@@ -19,6 +21,9 @@ local isaacSatanTaunts = {
 }
 local characterRestrictionTaunt = "万变不离其宗"
 local tauntCountdown = -1
+local seenCollectibles = {}
+local removedCollectibles = {}
+local processedCollectibleSpawns = {}
 
 local function isEnabled(challengeName)
     return mod.Data ~= nil and mod.Data[challengeName] == true
@@ -88,6 +93,29 @@ function Utils.registerNoDonationMachine(challengeName)
     end
 
     blockedDonationMachines[challengeName] = true
+end
+
+-- Register a challenge that dilutes damage dealt to monsters by anything
+-- other than a player-fired tear. The divisor starts at 10 on floor one and
+-- increases by 5 on every later floor.
+function Utils.registerNonPlayerTearDilution(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNonPlayerTearDilution expects a string.\n")
+        return
+    end
+
+    dilutedNonPlayerTears[challengeName] = true
+end
+
+-- Register a challenge that removes five unseen collectibles from the item
+-- pool whenever a collectible pedestal is generated.
+function Utils.registerRemoveItemsOnCollectibleSpawn(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerRemoveItemsOnCollectibleSpawn expects a string.\n")
+        return
+    end
+
+    removeItemsOnCollectibleSpawn[challengeName] = true
 end
 
 local function hasEnabledRule(registry)
@@ -180,11 +208,111 @@ local function removeDonationMachines()
     end
 end
 
+local function isPlayerTear(damageSource)
+    if damageSource == nil or damageSource.Entity == nil then
+        return false
+    end
+
+    local tear = damageSource.Entity:ToTear()
+    return tear ~= nil
+        and tear.SpawnerEntity ~= nil
+        and tear.SpawnerEntity:ToPlayer() ~= nil
+end
+
+local function diluteNonPlayerTearDamage(_, entity, amount, damageFlags, damageSource, damageCountdown)
+    if not hasEnabledRule(dilutedNonPlayerTears) then
+        return
+    end
+
+    if entity:ToNPC() == nil or isPlayerTear(damageSource) then
+        return
+    end
+
+    local data = entity:GetData()
+    if data.CCGUtilsDilutedDamage then
+        return
+    end
+
+    -- LevelStage starts at 1, so the divisor progresses as 10, 15, 20, ...
+    local dilutionDivisor = 5 + Game():GetLevel():GetStage() * 5
+    data.CCGUtilsDilutedDamage = true
+    entity:TakeDamage(amount / dilutionDivisor, damageFlags, damageSource, damageCountdown)
+    data.CCGUtilsDilutedDamage = nil
+    return false
+end
+
+local function getCollectibleSpawnKey(pickup)
+    local level = Game():GetLevel()
+    local roomDescriptor = level:GetCurrentRoomDesc()
+    return string.format(
+        "%d:%d:%d:%d",
+        level:GetStage(),
+        level:GetStageType(),
+        roomDescriptor.ListIndex,
+        pickup.InitSeed
+    )
+end
+
+local function removeRandomUnseenCollectibles()
+    local itemConfig = Isaac.GetItemConfig()
+    local collectibleCount = itemConfig:GetCollectibles().Size
+    local candidates = {}
+
+    for collectibleId = 1, collectibleCount - 1 do
+        local collectible = itemConfig:GetCollectible(collectibleId)
+        if collectible ~= nil
+            and collectible:IsAvailable()
+            and not collectible.Hidden
+            and not seenCollectibles[collectibleId]
+            and not removedCollectibles[collectibleId] then
+            table.insert(candidates, collectibleId)
+        end
+    end
+
+    local itemPool = Game():GetItemPool()
+    for _ = 1, math.min(5, #candidates) do
+        local index = Random() % #candidates + 1
+        local collectibleId = table.remove(candidates, index)
+        itemPool:RemoveCollectible(collectibleId)
+        removedCollectibles[collectibleId] = true
+    end
+end
+
+local function removeItemsOnCollectibleSpawnCallback(_, pickup)
+    if pickup.SubType <= 0 then
+        return
+    end
+    seenCollectibles[pickup.SubType] = true
+
+    if not hasEnabledRule(removeItemsOnCollectibleSpawn) then
+        return
+    end
+
+    local spawnKey = getCollectibleSpawnKey(pickup)
+    if processedCollectibleSpawns[spawnKey] then
+        return
+    end
+
+    processedCollectibleSpawns[spawnKey] = true
+    removeRandomUnseenCollectibles()
+end
+
+local function resetCollectibleSpawnHistory(_, isContinued)
+    if not isContinued then
+        seenCollectibles = {}
+        removedCollectibles = {}
+        processedCollectibleSpawns = {}
+    end
+end
+
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, restrictCharacter)
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_BIGCHEST)
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, showIsaacSatanTaunt)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, removeDonationMachines)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, removeDonationMachines)
+mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, diluteNonPlayerTearDamage)
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, removeItemsOnCollectibleSpawnCallback, PickupVariant.PICKUP_COLLECTIBLE)
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, resetCollectibleSpawnHistory)
 
 return Utils

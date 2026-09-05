@@ -17,10 +17,15 @@ end
 -- end
 -- mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.saveMyData)
 
-require("script.CCG_utils")
+local utils=require("script.CCG_utils")
 include("script.CCG_VS_YSD.fly_bone_club")
 include("script.CCG_VS_YSD.tainted_lost_happy")
 include("script.CCG_VS_YSD.sin_attribute")
 include("script.CCG_VS_YSD.grab_money")
 include("script.CCG_AND_YSD.super_void")
 include("script.CCG_VS_YSD.reverse_current")
+
+
+-------------------------------------------------------------
+-- mod.Data.Test=true
+-- utils.registerRemoveItemsOnCollectibleSpawn("Test")
