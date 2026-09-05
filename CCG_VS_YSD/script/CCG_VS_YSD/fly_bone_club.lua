@@ -1,5 +1,7 @@
 local mod=CCG_VS_YSD
+local utils=require("script.CCG_utils")
 local challenge_name="fly bone club"
+utils.registerAllowedCharacters(challenge_name, {PlayerType.PLAYER_THEFORGOTTEN})
 ---@param EntP EntityPlayer
 local function FBC_not_allow_soulHeart(_,EntP)
     if EntP:GetPlayerType()==PlayerType.PLAYER_THEFORGOTTEN then
@@ -19,26 +21,17 @@ local function FBC_force_long_range(_,EntP,CF)
         EntP.TearRange=20000
     end
 end
----@param EntP EntityPlayer
-local function FBC_force_the_forgotten(_,EntP)
-    if EntP:GetPlayerType()~=PlayerType.PLAYER_THEFORGOTTEN then
-        EntP:ChangePlayerType(PlayerType.PLAYER_THEFORGOTTEN)
-        Game():GetHUD():ShowFortuneText("万变不离其宗")
-    end
-end
 local function FBC_remove_item()
     local itemPool=Game():GetItemPool()
     itemPool:RemoveCollectible(CollectibleType.COLLECTIBLE_LIBRA)
 end
 function mod:FBC_on()
     mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,FBC_not_allow_soulHeart)
-    mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,FBC_force_the_forgotten)
     mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE,FBC_force_long_range,CacheFlag.CACHE_RANGE)
     mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED,FBC_remove_item)
 end
 function mod:FBC_off()
     mod:RemoveCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,FBC_not_allow_soulHeart)
-    mod:RemoveCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,FBC_force_the_forgotten)
     mod:RemoveCallback(ModCallbacks.MC_EVALUATE_CACHE,FBC_force_long_range)
     mod:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED,FBC_remove_item)
 end

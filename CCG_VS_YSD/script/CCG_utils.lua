@@ -6,9 +6,19 @@ local allowedCharacters = {}
 local allowedCharacterOrder = {}
 local blockedIsaacSatanEnds = {}
 local blockedDonationMachines = {}
+-- These were originally implemented by force_YSD.lua and apply globally.
+local alwaysBlockIsaacSatanEnd = true
+local alwaysBlockDonationMachines = true
 
 local DONATION_MACHINE_VARIANT = 8
 local GREED_DONATION_MACHINE_VARIANT = 11
+local isaacSatanTaunts = {
+    "逃避虽然可耻 但是没用",
+    "略鸭不完全 相当于完全不略鸭",
+    "亚波伦对你使用了虚空",
+}
+local characterRestrictionTaunt = "万变不离其宗"
+local tauntCountdown = -1
 
 local function isEnabled(challengeName)
     return mod.Data ~= nil and mod.Data[challengeName] == true
@@ -106,6 +116,7 @@ local function restrictCharacter(_, player)
 
     if fallbackPlayerType ~= nil and not allowed[player:GetPlayerType()] then
         player:ChangePlayerType(fallbackPlayerType)
+        Game():GetHUD():ShowFortuneText(characterRestrictionTaunt)
     end
 end
 
@@ -130,7 +141,7 @@ local function playersHaveCollectible(collectibleId)
 end
 
 local function preventIsaacSatanEnd()
-    if not hasEnabledRule(blockedIsaacSatanEnds) then
+    if not alwaysBlockIsaacSatanEnd and not hasEnabledRule(blockedIsaacSatanEnds) then
         return
     end
 
@@ -139,12 +150,25 @@ local function preventIsaacSatanEnd()
         and ((level:GetStageType() == 0 and not playersHaveCollectible(328))
             or (level:GetStageType() == 1 and not playersHaveCollectible(327))) then
         Game():StartStageTransition(false, 3, Isaac.GetPlayer())
+        tauntCountdown = 30
         return false
     end
 end
 
+local function showIsaacSatanTaunt()
+    if tauntCountdown < 0 then
+        return
+    end
+
+    if tauntCountdown == 0 then
+        local random = Random()
+        Game():GetHUD():ShowFortuneText(isaacSatanTaunts[random % #isaacSatanTaunts + 1])
+    end
+    tauntCountdown = tauntCountdown - 1
+end
+
 local function removeDonationMachines()
-    if not hasEnabledRule(blockedDonationMachines) then
+    if not alwaysBlockDonationMachines and not hasEnabledRule(blockedDonationMachines) then
         return
     end
 
@@ -156,9 +180,10 @@ local function removeDonationMachines()
     end
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, restrictCharacter)
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, restrictCharacter)
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_BIGCHEST)
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_TROPHY)
+mod:AddCallback(ModCallbacks.MC_POST_UPDATE, showIsaacSatanTaunt)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, removeDonationMachines)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, removeDonationMachines)
 

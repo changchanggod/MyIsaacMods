@@ -1,5 +1,7 @@
 local mod=CCG_VS_YSD
+local utils=require("script.CCG_utils")
 local challenge_name="tainted lost happy"
+utils.registerAllowedCharacters(challenge_name, {PlayerType.PLAYER_THELOST_B})
 ---@param EntNPC EntityNPC
 local function TLH_enemy_champion13(_,EntNPC)
     EntNPC:MakeChampion (EntNPC.InitSeed,13,true)
@@ -49,21 +51,12 @@ local function TLH_change_to_spiked_sock()
 end
 
 
----@param EntP EntityPlayer
-local function TLH_force_the_lost_B(_,EntP)
-    if EntP:GetPlayerType()~=PlayerType.PLAYER_THELOST_B then
-        EntP:ChangePlayerType(PlayerType.PLAYER_THELOST_B)
-        Game():GetHUD():ShowFortuneText("万变不离其宗")
-    end
-end
 function mod:TLH_on()
     mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT, TLH_enemy_champion13)
-    mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,TLH_force_the_lost_B)
     mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, TLH_change_to_spiked_sock)
 end
 function mod:TLH_off()
     mod:RemoveCallback(ModCallbacks.MC_POST_NPC_INIT, TLH_enemy_champion13)
-    mod:RemoveCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,TLH_force_the_lost_B)
     mod:RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM, TLH_change_to_spiked_sock)
 end
 

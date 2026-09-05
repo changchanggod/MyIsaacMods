@@ -1,25 +1,18 @@
 local mod=CCG_VS_YSD
+local utils=require("script.CCG_utils")
 local challenge_name="grab money"
+utils.registerAllowedCharacters(challenge_name, {PlayerType.PLAYER_KEEPER_B})
 ---@param entPick EntityPickup
 local function GM_quicker_disappear_money(_,entPick)
     if entPick.FrameCount==1 then
         entPick.Timeout=math.min(entPick.Timeout,entPick.Timeout/2)
     end
 end
-local function GM_force_the_keeper(_,EntP)
-    if EntP:GetPlayerType()~=PlayerType.PLAYER_KEEPER_B then
-        EntP:ChangePlayerType(PlayerType.PLAYER_KEEPER_B)
-        Game():GetHUD():ShowFortuneText("万变不离其宗")
-    end
-end
-
 function mod:GM_on()
     mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE,GM_quicker_disappear_money,PickupVariant.PICKUP_COIN)
-    mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,GM_force_the_keeper)
 end
 function mod:GM_off()
     mod:RemoveCallback(ModCallbacks.MC_POST_PICKUP_UPDATE,GM_quicker_disappear_money)
-    mod:RemoveCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,GM_force_the_keeper)
 end
 
 -------------------------------------------------------------------------------------------------------------------------------
