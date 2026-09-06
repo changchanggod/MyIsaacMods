@@ -111,6 +111,7 @@ mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, restrictCharacter)
 -- ================================================================
 
 local dilutedNonPlayerTears = {}
+local URN_OF_SOULS = CollectibleType.COLLECTIBLE_URN_OF_SOULS
 
 function Utils.registerNonPlayerTearDilution(challengeName)
     if type(challengeName) ~= "string" then
@@ -127,9 +128,17 @@ local function isPlayerTear(damageSource)
     end
 
     local tear = damageSource.Entity:ToTear()
-    return tear ~= nil
-        and tear.SpawnerEntity ~= nil
-        and tear.SpawnerEntity:ToPlayer() ~= nil
+    local player = tear and tear.SpawnerEntity and tear.SpawnerEntity:ToPlayer()
+    if player == nil then
+        return false
+    end
+
+    -- Urn of Souls blue flames are internally player tears, but should be
+    -- diluted together with other non-standard damage sources.
+    return not (
+        tear.Variant == TearVariant.FIRE
+        and player:HasCollectible(URN_OF_SOULS)
+    )
 end
 
 local function diluteNonPlayerTearDamage(_, entity, amount, damageFlags, damageSource, damageCountdown)
