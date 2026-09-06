@@ -1,5 +1,5 @@
 local mod = CCG_VS_YSD
-local challenge_name = "death list damage"
+local challenge_name = "死神名册练习"
 
 local DEATHS_LIST = CollectibleType.COLLECTIBLE_DEATHS_LIST
 local DEATHS_LIST_MARK = EffectVariant.DEATH_SKULL
@@ -102,7 +102,7 @@ if ModConfigMenu then
             return mod.Data[challenge_name]
         end,
         Display = function()
-            return "死神名册惩罚:" .. tostring(mod.Data[challenge_name])
+            return "死神名册练习:" .. tostring(mod.Data[challenge_name])
         end,
         OnChange = function(boolean)
             if mod.Data[challenge_name] ~= boolean then
