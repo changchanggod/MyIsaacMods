@@ -5,6 +5,21 @@ local DEATHS_LIST = CollectibleType.COLLECTIBLE_DEATHS_LIST
 local DEATHS_LIST_MARK = EffectVariant.DEATH_SKULL
 local DAMAGE_MULTIPLIER = 0.01
 
+---@param _ Mod
+---@param isContinued boolean
+local function DLD_give_deaths_list(_, isContinued)
+    if isContinued then
+        return
+    end
+
+    for playerIndex = 0, Game():GetNumPlayers() - 1 do
+        local player = Isaac.GetPlayer(playerIndex)
+        if not player:HasCollectible(DEATHS_LIST) then
+            player:AddCollectible(DEATHS_LIST)
+        end
+    end
+end
+
 local function playerHasDeathsList()
     for playerIndex = 0, Game():GetNumPlayers() - 1 do
         if Isaac.GetPlayer(playerIndex):HasCollectible(DEATHS_LIST) then
@@ -53,11 +68,14 @@ end
 
 function mod:DLD_on()
     mod:RemoveCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, DLD_reduce_unmarked_damage)
+    mod:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, DLD_give_deaths_list)
     mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, DLD_reduce_unmarked_damage)
+    mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, DLD_give_deaths_list)
 end
 
 function mod:DLD_off()
     mod:RemoveCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, DLD_reduce_unmarked_damage)
+    mod:RemoveCallback(ModCallbacks.MC_POST_GAME_STARTED, DLD_give_deaths_list)
 end
 
 if mod.Data == nil then
