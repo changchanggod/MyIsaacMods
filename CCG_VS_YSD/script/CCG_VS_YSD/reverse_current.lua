@@ -23,6 +23,7 @@ local RC_tear_to_projectile_flag={
     --{ TearFlags.TEAR_SPECTRAL,ProjectileFlags.NO_WALL_COLLIDE }, --特判
     --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CREEP_BROWN},--无对应
     --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.FIRE},--未见效果
+    { TearFlags.TEAR_QUADSPLIT,ProjectileFlags.BURST},
     --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.ANY_HEIGHT_ENTITY_HIT},--已包括
     --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CURVE_LEFT},--TODO
     --{ TearFlags.TEAR_COIN_DROP,ProjectileFlags.CURVE_RIGHT},--TODO
@@ -96,7 +97,11 @@ local RC_remove_attack_item={
     CollectibleType.COLLECTIBLE_BERSERK,
     CollectibleType.COLLECTIBLE_DARK_ARTS,
     CollectibleType.COLLECTIBLE_MEGA_BLAST,
-    CollectibleType.COLLECTIBLE_LARYNX
+    CollectibleType.COLLECTIBLE_LARYNX,
+    CollectibleType.COLLECTIBLE_ANTI_GRAVITY,
+    CollectibleType.COLLECTIBLE_AKELDAMA,
+    CollectibleType.COLLECTIBLE_TAURUS,
+
 }
 
 local function RC_remove_attack_item_from_pool()
