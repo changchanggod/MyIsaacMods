@@ -1,5 +1,7 @@
 local mod=CCG_VS_YSD
 local challenge_name="reverse current"
+local utils=require("script.CCG_utils")
+utils.registerNonPlayerTearDilution(challenge_name)
 
 local RC_room_seed=-1
 local RC_room_index=-1
