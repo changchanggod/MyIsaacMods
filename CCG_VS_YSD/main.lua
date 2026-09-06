@@ -23,6 +23,8 @@ include("script.CCG_VS_YSD.tainted_lost_happy")
 include("script.CCG_VS_YSD.sin_attribute")
 include("script.CCG_VS_YSD.grab_money")
 include("script.CCG_AND_YSD.super_void")
+include("script.CCG_AND_YSD.giga_fetus")
+include("script.CCG_AND_YSD.death_list_damage")
 include("script.CCG_VS_YSD.reverse_current")
 
 
