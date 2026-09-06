@@ -1,33 +1,44 @@
+--[[
+CCG_utils 使用说明
+
+在挑战文件中加载本模块后，以挑战名登记所需功能：
+    local utils = require("script.CCG_utils")
+    utils.registerAllowedCharacters("challenge name", {PlayerType.PLAYER_ISAAC})
+    utils.registerNonPlayerTearDilution("challenge name")
+    utils.registerRemoveItemsOnCollectibleSpawn("challenge name")
+
+登记规则仅在 mod.Data["challenge name"] == true 时生效。
+多个已开启的人物限制会合并允许人物集合；其他登记规则任一开启即生效。
+]]
+
 local mod = CCG_VS_YSD
 local Utils = {}
 
--- Registries are keyed by the same challenge-name strings used by mod.Data.
-local allowedCharacters = {}
-local allowedCharacterOrder = {}
-local blockedIsaacSatanEnds = {}
-local blockedDonationMachines = {}
-local dilutedNonPlayerTears = {}
-local removeItemsOnCollectibleSpawn = {}
--- These were originally implemented by force_YSD.lua and apply globally.
-local alwaysBlockIsaacSatanEnd = true
-local alwaysBlockDonationMachines = true
-
-local DONATION_MACHINE_VARIANT = 8
-local GREED_DONATION_MACHINE_VARIANT = 11
-local isaacSatanTaunts = {
-    "逃避虽然可耻 但是没用",
-    "略鸭不完全 相当于完全不略鸭",
-    "亚波伦对你使用了虚空",
-}
-local characterRestrictionTaunt = "万变不离其宗"
-local tauntCountdown = -1
-local seenCollectibles = {}
-local removedCollectibles = {}
-local processedCollectibleSpawns = {}
+-- ================================================================
+-- 公共辅助
+-- ================================================================
 
 local function isEnabled(challengeName)
     return mod.Data ~= nil and mod.Data[challengeName] == true
 end
+
+local function hasEnabledRule(registry)
+    for challengeName in pairs(registry) do
+        if isEnabled(challengeName) then
+            return true
+        end
+    end
+    return false
+end
+
+-- ================================================================
+-- registerAllowedCharacters
+-- 限制人物；所有已开启规则的人物集合会合并。
+-- ================================================================
+
+local allowedCharacters = {}
+local allowedCharacterOrder = {}
+local characterRestrictionTaunt = "万变不离其宗"
 
 local function normalizePlayerTypes(playerTypes)
     local result = {}
@@ -48,8 +59,6 @@ local function normalizePlayerTypes(playerTypes)
     return result, firstPlayerType
 end
 
--- Register the player types a challenge may use.  A player outside this set
--- is converted to the first registered type when it is initialized.
 function Utils.registerAllowedCharacters(challengeName, playerTypes)
     if type(challengeName) ~= "string" or type(playerTypes) ~= "table" then
         Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerAllowedCharacters expects a string and a table.\n")
@@ -74,64 +83,10 @@ function Utils.registerAllowedCharacters(challengeName, playerTypes)
     }
 end
 
--- Register a challenge whose Isaac/Satan ending chest may not be used.
-function Utils.registerNoIsaacSatanEnd(challengeName)
-    if type(challengeName) ~= "string" then
-        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNoIsaacSatanEnd expects a string.\n")
-        return
-    end
-
-    blockedIsaacSatanEnds[challengeName] = true
-end
-
--- Register a challenge in which donation machines and Greed donation
--- machines are removed whenever they appear.
-function Utils.registerNoDonationMachine(challengeName)
-    if type(challengeName) ~= "string" then
-        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNoDonationMachine expects a string.\n")
-        return
-    end
-
-    blockedDonationMachines[challengeName] = true
-end
-
--- Register a challenge that dilutes damage dealt to monsters by anything
--- other than a player-fired tear. The divisor starts at 10 on floor one and
--- increases by 5 on every later floor.
-function Utils.registerNonPlayerTearDilution(challengeName)
-    if type(challengeName) ~= "string" then
-        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNonPlayerTearDilution expects a string.\n")
-        return
-    end
-
-    dilutedNonPlayerTears[challengeName] = true
-end
-
--- Register a challenge that removes five unseen collectibles from the item
--- pool whenever a collectible pedestal is generated.
-function Utils.registerRemoveItemsOnCollectibleSpawn(challengeName)
-    if type(challengeName) ~= "string" then
-        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerRemoveItemsOnCollectibleSpawn expects a string.\n")
-        return
-    end
-
-    removeItemsOnCollectibleSpawn[challengeName] = true
-end
-
-local function hasEnabledRule(registry)
-    for challengeName in pairs(registry) do
-        if isEnabled(challengeName) then
-            return true
-        end
-    end
-    return false
-end
-
 local function restrictCharacter(_, player)
     local allowed = {}
     local fallbackPlayerType = nil
 
-    -- All enabled challenge rules contribute to one shared allowed set.
     for _, challengeName in ipairs(allowedCharacterOrder) do
         local rule = allowedCharacters[challengeName]
         if isEnabled(challengeName) then
@@ -148,64 +103,22 @@ local function restrictCharacter(_, player)
     end
 end
 
-local function playersHaveCollectible(collectibleId)
-    local index = 0
-    local checked = {}
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, restrictCharacter)
 
-    while true do
-        local player = Isaac.GetPlayer(index)
-        if checked[player.Index] then
-            break
-        end
-        checked[player.Index] = true
+-- ================================================================
+-- registerNonPlayerTearDilution
+-- 怪物受到非玩家泪弹伤害时，将伤害按楼层稀释。
+-- ================================================================
 
-        if player:HasCollectible(collectibleId, true) then
-            return true
-        end
-        index = index + 1
-    end
+local dilutedNonPlayerTears = {}
 
-    return false
-end
-
-local function preventIsaacSatanEnd()
-    if not alwaysBlockIsaacSatanEnd and not hasEnabledRule(blockedIsaacSatanEnds) then
+function Utils.registerNonPlayerTearDilution(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNonPlayerTearDilution expects a string.\n")
         return
     end
 
-    local level = Game():GetLevel()
-    if level:GetStage() == LevelStage.STAGE5
-        and ((level:GetStageType() == 0 and not playersHaveCollectible(328))
-            or (level:GetStageType() == 1 and not playersHaveCollectible(327))) then
-        Game():StartStageTransition(false, 3, Isaac.GetPlayer())
-        tauntCountdown = 30
-        return false
-    end
-end
-
-local function showIsaacSatanTaunt()
-    if tauntCountdown < 0 then
-        return
-    end
-
-    if tauntCountdown == 0 then
-        local random = Random()
-        Game():GetHUD():ShowFortuneText(isaacSatanTaunts[random % #isaacSatanTaunts + 1])
-    end
-    tauntCountdown = tauntCountdown - 1
-end
-
-local function removeDonationMachines()
-    if not alwaysBlockDonationMachines and not hasEnabledRule(blockedDonationMachines) then
-        return
-    end
-
-    for _, slot in pairs(Isaac.FindByType(EntityType.ENTITY_SLOT, -1, -1, false, false)) do
-        if slot.Variant == DONATION_MACHINE_VARIANT
-            or slot.Variant == GREED_DONATION_MACHINE_VARIANT then
-            slot:Remove()
-        end
-    end
+    dilutedNonPlayerTears[challengeName] = true
 end
 
 local function isPlayerTear(damageSource)
@@ -239,6 +152,27 @@ local function diluteNonPlayerTearDamage(_, entity, amount, damageFlags, damageS
     entity:TakeDamage(amount / dilutionDivisor, damageFlags, damageSource, damageCountdown)
     data.CCGUtilsDilutedDamage = nil
     return false
+end
+
+mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, diluteNonPlayerTearDamage)
+
+-- ================================================================
+-- registerRemoveItemsOnCollectibleSpawn
+-- 每生成一个道具，随机移除五个尚未出现的道具池道具。
+-- ================================================================
+
+local removeItemsOnCollectibleSpawn = {}
+local seenCollectibles = {}
+local removedCollectibles = {}
+local processedCollectibleSpawns = {}
+
+function Utils.registerRemoveItemsOnCollectibleSpawn(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerRemoveItemsOnCollectibleSpawn expects a string.\n")
+        return
+    end
+
+    removeItemsOnCollectibleSpawn[challengeName] = true
 end
 
 local function getCollectibleSpawnKey(pickup)
@@ -305,14 +239,116 @@ local function resetCollectibleSpawnHistory(_, isContinued)
     end
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE, restrictCharacter)
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, removeItemsOnCollectibleSpawnCallback, PickupVariant.PICKUP_COLLECTIBLE)
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, resetCollectibleSpawnHistory)
+
+-- ================================================================
+-- registerNoIsaacSatanEnd
+-- 禁止以撒/撒旦终点；force_YSD 原逻辑现作为内置常驻规则。
+-- ================================================================
+
+local blockedIsaacSatanEnds = {}
+local alwaysBlockIsaacSatanEnd = true
+local isaacSatanTaunts = {
+    "逃避虽然可耻 但是没用",
+    "略鸭不完全 相当于完全不略鸭",
+    "亚波伦对你使用了虚空",
+}
+local tauntCountdown = -1
+
+function Utils.registerNoIsaacSatanEnd(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNoIsaacSatanEnd expects a string.\n")
+        return
+    end
+
+    blockedIsaacSatanEnds[challengeName] = true
+end
+
+local function playersHaveCollectible(collectibleId)
+    local index = 0
+    local checked = {}
+
+    while true do
+        local player = Isaac.GetPlayer(index)
+        if checked[player.Index] then
+            break
+        end
+        checked[player.Index] = true
+
+        if player:HasCollectible(collectibleId, true) then
+            return true
+        end
+        index = index + 1
+    end
+
+    return false
+end
+
+local function preventIsaacSatanEnd()
+    if not alwaysBlockIsaacSatanEnd and not hasEnabledRule(blockedIsaacSatanEnds) then
+        return
+    end
+
+    local level = Game():GetLevel()
+    if level:GetStage() == LevelStage.STAGE5
+        and ((level:GetStageType() == 0 and not playersHaveCollectible(328))
+            or (level:GetStageType() == 1 and not playersHaveCollectible(327))) then
+        Game():StartStageTransition(false, 3, Isaac.GetPlayer())
+        tauntCountdown = 30
+        return false
+    end
+end
+
+local function showIsaacSatanTaunt()
+    if tauntCountdown < 0 then
+        return
+    end
+
+    if tauntCountdown == 0 then
+        local random = Random()
+        Game():GetHUD():ShowFortuneText(isaacSatanTaunts[random % #isaacSatanTaunts + 1])
+    end
+    tauntCountdown = tauntCountdown - 1
+end
+
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_BIGCHEST)
 mod:AddCallback(ModCallbacks.MC_PRE_PICKUP_COLLISION, preventIsaacSatanEnd, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, showIsaacSatanTaunt)
+
+-- ================================================================
+-- registerNoDonationMachine
+-- 删除捐款机和贪婪捐款机；force_YSD 原逻辑现作为内置常驻规则。
+-- ================================================================
+
+local blockedDonationMachines = {}
+local alwaysBlockDonationMachines = true
+local DONATION_MACHINE_VARIANT = 8
+local GREED_DONATION_MACHINE_VARIANT = 11
+
+function Utils.registerNoDonationMachine(challengeName)
+    if type(challengeName) ~= "string" then
+        Isaac.ConsoleOutput("[CCG VS YSD][Error]: registerNoDonationMachine expects a string.\n")
+        return
+    end
+
+    blockedDonationMachines[challengeName] = true
+end
+
+local function removeDonationMachines()
+    if not alwaysBlockDonationMachines and not hasEnabledRule(blockedDonationMachines) then
+        return
+    end
+
+    for _, slot in pairs(Isaac.FindByType(EntityType.ENTITY_SLOT, -1, -1, false, false)) do
+        if slot.Variant == DONATION_MACHINE_VARIANT
+            or slot.Variant == GREED_DONATION_MACHINE_VARIANT then
+            slot:Remove()
+        end
+    end
+end
+
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, removeDonationMachines)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, removeDonationMachines)
-mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, diluteNonPlayerTearDamage)
-mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, removeItemsOnCollectibleSpawnCallback, PickupVariant.PICKUP_COLLECTIBLE)
-mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, resetCollectibleSpawnHistory)
 
 return Utils
