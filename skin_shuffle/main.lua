@@ -8,6 +8,7 @@ local Category = {
     PICKUP = 4,
     FRIENDLY = 5,
     INVULNERABLE = 6,
+    PLAYER = 7
 }
 
 local function reset()
@@ -18,6 +19,7 @@ local function reset()
         [Category.PICKUP] = false,
         [Category.FRIENDLY] = false,
         [Category.INVULNERABLE] = false,
+        [Category.PLAYER] = false,
     }
 end
 
@@ -97,7 +99,11 @@ local function isEntityIncluded(entity)
             return true
         end
     end
-
+    if mod.setting[Category.PLAYER] then
+        if entity.Type==EntityType.ENTITY_PLAYER then
+            return true
+        end
+    end
     return false
 end
 
@@ -145,6 +151,25 @@ function mod:onNewRoom()
 end
 
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
+
+function mod:remove_player_costume()
+    if mod.setting[Category.PLAYER] then
+        local index = 0
+        local remove = {}
+
+        while true do
+            local player = Isaac.GetPlayer(index)
+            if remove[player.Index] then
+                break
+            end
+            remove[player.Index] = true
+            player:ClearCostumes()
+            index = index + 1
+        end
+    end
+end
+
+mod:AddCallback(ModCallbacks.MC_POST_RENDER,mod.remove_player_costume)
 
 ----------------------------------------------------------------------------
 -- Render: Build entityPosCache & Chain Propagation
@@ -195,26 +220,26 @@ local function round2(v)
     return math.floor(v * 100 + 0.5) * 0.01
 end
 
----@param npc EntityNPC
-function mod:onNpcUpdate(npc)
+---@param ent Entity
+function mod:onEntityUpdate(ent)
 
     if next(mapping) == nil then
-        npc.SpriteOffset=Vector.Zero
+        ent.SpriteOffset=Vector.Zero
         return
     end
 
-    if not mapping[npc.Index] then
-        npc.SpriteOffset=Vector.Zero
+    if not mapping[ent.Index] then
+        ent.SpriteOffset=Vector.Zero
         return
     end
 
-    if entityOffsetCache[npc.Index] then
-        npc.SpriteOffset=entityOffsetCache[npc.Index]
+    if entityOffsetCache[ent.Index] then
+        ent.SpriteOffset=entityOffsetCache[ent.Index]
     end
 
-    local spr = npc:GetSprite()
-    local prevFlipX = flipXCache[npc.Index]
-    local prevFlipY = flipYCache[npc.Index]
+    local spr = ent:GetSprite()
+    local prevFlipX = flipXCache[ent.Index]
+    local prevFlipY = flipYCache[ent.Index]
     if prevFlipX == nil then
         prevFlipX = false
     end
@@ -222,26 +247,26 @@ function mod:onNpcUpdate(npc)
         prevFlipY = false
     end
 
-    if prevFlipX ~= npc.FlipX or prevFlipY ~= spr.FlipY then
-        flipXCache[npc.Index] = npc.FlipX
-        flipYCache[npc.Index] = spr.FlipY
-        local offset = npc.SpriteOffset
+    if prevFlipX ~= ent.FlipX or prevFlipY ~= spr.FlipY then
+        flipXCache[ent.Index] = ent.FlipX
+        flipYCache[ent.Index] = spr.FlipY
+        local offset = ent.SpriteOffset
         local x = offset.X
         local y = offset.Y
-        if prevFlipX ~= npc.FlipX then
-            if npc.SpriteRotation==180 then
-                if npc.FlipX then
+        if prevFlipX ~= ent.FlipX then
+            if ent.SpriteRotation==180 then
+                if ent.FlipX then
                     x=x/3
-                    x=x/ (4.3710*npc.SpriteScale.X+1.4348)*5.85
+                    x=x/ (4.3710*ent.SpriteScale.X+1.4348)*5.85
                 else
-                    x=x*(4.3710*npc.SpriteScale.X+1.4348)/5.85
+                    x=x*(4.3710*ent.SpriteScale.X+1.4348)/5.85
                     x=x*3
                 end
                 
             else
                  x = -x
-                if npc.FlipX then
-                    x = x / (npc.SpriteScale.X * 2 - 1)
+                if ent.FlipX then
+                    x = x / (ent.SpriteScale.X * 2 - 1)
                 end
             end
            
@@ -249,72 +274,74 @@ function mod:onNpcUpdate(npc)
         end
         if prevFlipY~=spr.FlipY then
             if spr.FlipY then
-                if npc.SpriteRotation==-90 then
-                    x = x - 2 * y*npc.SpriteScale.X
+                if ent.SpriteRotation==-90 then
+                    x = x - 2 * y*ent.SpriteScale.X
                 else
-                    x = x + 2 * y*npc.SpriteScale.X
+                    x = x + 2 * y*ent.SpriteScale.X
                 end
             else
-                if npc.SpriteRotation==-90 then
-                    x = x + 2 * y*npc.SpriteScale.X
+                if ent.SpriteRotation==-90 then
+                    x = x + 2 * y*ent.SpriteScale.X
                 else
-                    x = x - 2 * y*npc.SpriteScale.X
+                    x = x - 2 * y*ent.SpriteScale.X
                 end
             end
         end
         
-        npc.SpriteOffset = Vector(x, y)
+        ent.SpriteOffset = Vector(x, y)
 
     end
 end
 
-mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onNpcUpdate)
+mod:AddCallback(ModCallbacks.MC_NPC_UPDATE, mod.onEntityUpdate)
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,mod.onEntityUpdate)
 
 ----------------------------------------------------------------------------
 -- NPC Render: Apply SpriteOffset per NPC
 ----------------------------------------------------------------------------
----@param npc  EntityNPC
-function mod:updateNPCSprOffset(npc, _)
+---@param ent  Entity
+function mod:updateEntitySprOffset(ent, _)
     if next(mapping) == nil then
-        npc.SpriteOffset=Vector.Zero
+        ent.SpriteOffset=Vector.Zero
         return
     end
 
-    local tgtIdx = mapping[npc.Index]
+    local tgtIdx = mapping[ent.Index]
     if not tgtIdx then
-        npc.SpriteOffset=Vector.Zero
+        ent.SpriteOffset=Vector.Zero
         return
     end
 
     local tgtPos = entityPosCache[tgtIdx]
     if not tgtPos then
-        npc.SpriteOffset=Vector.Zero
+        ent.SpriteOffset=Vector.Zero
         return
     end
 
-    local dx = round2(tgtPos.X - npc.Position.X)
-    local dy = round2(tgtPos.Y - npc.Position.Y)
-    if npc.FlipX then
-        if npc.SpriteRotation==180 then
+    local dx = round2(tgtPos.X - ent.Position.X)
+    local dy = round2(tgtPos.Y - ent.Position.Y)
+    if ent.FlipX then
+        if ent.SpriteRotation==180 then
             dx=dx/3
-            dx=dx/ (4.3710*npc.SpriteScale.X+1.4348)*5.85
+            dx=dx/ (4.3710*ent.SpriteScale.X+1.4348)*5.85
         else
-            dx = -dx / (npc.SpriteScale.X*2-1)
+            dx = -dx / (ent.SpriteScale.X*2-1)
         end
     end
-    local spr=npc:GetSprite()
+    local spr=ent:GetSprite()
     if spr.FlipY then
-        if npc.SpriteRotation==-90 then
-            dx=dx-2*dy*npc.SpriteScale.X
+        if ent.SpriteRotation==-90 then
+            dx=dx-2*dy*ent.SpriteScale.X
         else
-            dx=dx+2*dy*npc.SpriteScale.X
+            dx=dx+2*dy*ent.SpriteScale.X
         end
     end
-    npc.SpriteOffset = Vector(dx, dy)*fixArgs
-    entityOffsetCache[npc.Index]=Vector(npc.SpriteOffset.X,npc.SpriteOffset.Y)
+    ent.SpriteOffset = Vector(dx, dy)*fixArgs
+    entityOffsetCache[ent.Index]=Vector(ent.SpriteOffset.X,ent.SpriteOffset.Y)
 end
 
-mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.updateNPCSprOffset)
+mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.updateEntitySprOffset)
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_RENDER, mod.updateEntitySprOffset)
 
 ---@param EntityPick EntityPickup
 function mod:updatePickupSprOffset(EntityPick,_)
@@ -394,6 +421,9 @@ local FC_MCM = {
         N5 = "\230\151\160\230\149\140\230\156\186\229\133\179: ",
         O5 = { "\229\133\179", "\229\188\128" },
         K5 = "\229\140\133\230\139\172\229\136\186\231\159\179\227\128\129\231\159\179\229\131\143\233\172\188\231\173\137\228\184\141\229\143\175\231\160\180\229\157\143\231\154\132\230\149\140\228\186\186",
+        N6 = "\231\142\169\229\174\182: ",
+        O6 = { "\229\133\179", "\229\188\128" },
+        K6 = "\229\140\133\230\139\172\231\142\169\229\174\182\232\167\146\232\137\178",
     },
     en = {
         MN = "Skin Shuffle",
@@ -416,6 +446,9 @@ local FC_MCM = {
         N5 = "Invulnerable Traps: ",
         O5 = { "OFF", "ON" },
         K5 = "Include indestructible enemies (stone grimaces, etc.)",
+        N6 = "Player: ",
+        O6 = { "OFF", "ON" },
+        K6 = "Include player characters",
     }
 }
 
@@ -444,6 +477,7 @@ if ModConfigMenu and mod.setting then
         { cat = Category.PICKUP,    name = "N3", opt = "O3", tooltip = "K3" },
         { cat = Category.FRIENDLY,  name = "N4", opt = "O4", tooltip = "K4" },
         { cat = Category.INVULNERABLE, name = "N5", opt = "O5", tooltip = "K5" },
+        { cat = Category.PLAYER,    name = "N6", opt = "O6", tooltip = "K6" },
     }
 
     for _, desc in ipairs(settingDescriptors) do
@@ -460,7 +494,7 @@ if ModConfigMenu and mod.setting then
             OnChange = function(n)
                 if desc.isMaster then
                     mod.setting[Category.MASTER] = n == 1
-                    for cat = Category.NORMAL, Category.INVULNERABLE do
+                    for cat = Category.NORMAL, Category.PLAYER do
                         mod.setting[cat] = n == 1
                     end
                 else
