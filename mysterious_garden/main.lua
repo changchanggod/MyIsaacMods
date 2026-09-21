@@ -1,13 +1,19 @@
-local mod=RegisterMod("mysterious garden", 1)
+local mod=RegisterMod("mysterious garden", 2)
 local curseFreeFrame=0
 local glowingHourglassFrame=0
 local glowingHourglassRoomInd=-1
 local sandCurseLevel=0
 local drunkCurseLevel=0
 local hearCurseLevel=0
-local clearCurse=false
-
+local CurseStopGrow=false
+local stageCount=0
 local RECOMMENDED_SHIFT_IDX = 35
+
+
+
+
+
+
 local game = Game()
 local seeds = game:GetSeeds()
 local startSeed = seeds:GetStartSeed()
@@ -27,18 +33,9 @@ function mod:gameInit(isC)
     sandCurseLevel=0
     drunkCurseLevel=0
     hearCurseLevel=0
-    clearCurse=false
+    CurseStopGrow=false
 end
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.gameInit)
-
-local function getStage()
-    local stage= Game():GetLevel():GetStage()
-    if Game():GetLevel():IsAscent() then
-        return 13-stage
-    end
-    return stage
-end
-
 
 --- 开始增加3血上限
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED,function (_,isC)
@@ -51,11 +48,6 @@ mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED,function (_,isC)
             end
             checked[player.Index] = true
             player:AddMaxHearts(6)
-            if not player:HasTrinket(TrinketType.TRINKET_FADED_POLAROID) then
-                local pos = Isaac.GetRandomPosition()
-                local room=Game():GetRoom()
-                game:Spawn(5, 350, room:FindFreePickupSpawnPosition(pos, 10, true, true), Vector(0, 0), nil, TrinketType.TRINKET_FADED_POLAROID,room:GetSpawnSeed())
-            end
             index = index + 1
         end
     end
@@ -80,51 +72,47 @@ end)
 --- 特殊效果(龙)
 mod:AddCallback(ModCallbacks.MC_PRE_USE_ITEM,function (_,itemT)
     local level=Game():GetLevel()
-    if not level:IsAscent() and level:GetStage()~=LevelStage.STAGE8 and itemT==CollectibleType.COLLECTIBLE_GLOWING_HOUR_GLASS then
-        clearCurse=true
-        Game():StartStageTransition(false, 6, Isaac.GetPlayer())
+    if level:IsAscent() then
+        return
     end
-    return false
+    if level:GetStage()==LevelStage.STAGE3_1 and (level:GetStageType()==StageType.STAGETYPE_REPENTANCE or level:GetStageType()==StageType.STAGETYPE_REPENTANCE_B) then
+        return
+    end
+    if level:GetStage()==LevelStage.STAGE3_2 and (level:GetStageType()==StageType.STAGETYPE_REPENTANCE or level:GetStageType()==StageType.STAGETYPE_REPENTANCE_B) and not Game():GetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT) then
+        return
+    end
+    if level:GetStage()>LevelStage.STAGE3_2 then
+        return
+    end
+    if itemT==CollectibleType.COLLECTIBLE_GLOWING_HOUR_GLASS then
+        Game():SetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH,true)
+        Game():StartStageTransition(true, 5, Isaac.GetPlayer())
+        CurseStopGrow=true
+        return false
+    end
 end)
 
 
 --- 泥沙诅咒
 local sandCurseSpr=Sprite()
-sandCurseSpr:Load("gfx/sand_curse.anm2", true)
+
+sandCurseSpr:Load("gfx/sand_curse2.anm2",true)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER,function (_)
     if curseFreeFrame>0 then
         return
     end
-    local screenRadius=math.sqrt(Isaac.GetScreenWidth()*Isaac.GetScreenWidth()+Isaac.GetScreenHeight()*Isaac.GetScreenHeight()) 
-    local curseRadius=screenRadius*math.max(1-sandCurseLevel*0.1,0)
+    sandCurseSpr.Scale=Vector.One/3
     sandCurseSpr.Rotation=0
-    sandCurseSpr.Scale=Vector.One*curseRadius/600
-    if sandCurseSpr.Scale.X>0.8 then
-        sandCurseSpr:Play("sand curse",true)
-    elseif sandCurseSpr.Scale.X>0.4 then
-        sandCurseSpr.Scale=sandCurseSpr.Scale*2
-        sandCurseSpr:Play("sand curse2",true)
-    elseif sandCurseSpr.Scale.X>0.2 then
-        sandCurseSpr.Scale=sandCurseSpr.Scale*4
-        sandCurseSpr:Play("sand curse4",true)
-    elseif sandCurseSpr.Scale.X>0.1 then
-        sandCurseSpr.Scale=sandCurseSpr.Scale*8
-        sandCurseSpr:Play("sand curse8",true)
-    else
-        sandCurseSpr.Scale=Vector.One*2
-        sandCurseSpr:Play("sand curseAll",true)
+    if sandCurseLevel >= 1 then
+        if sandCurseLevel>13 then
+            sandCurseLevel=13
+        end
+        sandCurseSpr:Play("sandCurse"..sandCurseLevel, true)
+        local renderPos=Vector(Isaac.GetScreenWidth()/2,Isaac.GetScreenHeight()/2)
+        sandCurseSpr:Render(renderPos)
     end
-    local renderPos=Isaac.GetPlayer().Position
-    renderPos=Isaac.WorldToScreen(renderPos)
-    if Game():GetRoom():IsMirrorWorld() then
-        renderPos.X=Isaac.GetScreenWidth()-renderPos.X
-    end
-    sandCurseSpr:Render(renderPos)
+    
 end)
-
-
-
-
 
 
 
@@ -408,20 +396,68 @@ end
 
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.address_room_change)
 
---- 幻听诅咒
-local sfxManager=SFXManager()
-mod:AddCallback(ModCallbacks.MC_POST_UPDATE,function ()
-    if curseFreeFrame>0 or hearCurseLevel<=0 then
+--- 氮醉诅咒2.0
+local affectDirAngle=90
+local lastV=Vector.Zero
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_UPDATE,function (_,EntP)
+    if curseFreeFrame>0 then
+        lastV=EntP.Velocity
         return
     end
-    local rand=myRNG:RandomInt(1089)+1
-    sfxManager:Play(rand,0.5+myRNG:RandomFloat(),1,false,0.5+myRNG:RandomFloat(),0)
+    local difV=EntP.Velocity-lastV
+    local affectScale=0
+    if drunkCurseLevel==1 then
+        affectScale=0.5
+    elseif drunkCurseLevel==2 then
+        affectScale=0.8
+    end
+    local affectLength=difV:Length()*affectScale
+    if affectLength>10 then
+        affectLength=10
+    end
+    affectDirAngle=affectDirAngle+(myRNG:RandomFloat()-0.4)
+    EntP.Velocity=EntP.Velocity+affectLength*Vector.FromAngle(affectDirAngle+difV:GetAngleDegrees())
+    lastV=EntP.Velocity
+    if EntP.Velocity:Length()>1000 or lastV:Length()>1000 then
+        EntP.Velocity=Vector.Zero
+        lastV=Vector.Zero
+        curseFreeFrame=30
+    end
 end)
+
+
+
+--- 幻听诅咒
+local sfxManager=SFXManager()
+local musicManager=MusicManager()
+local drown=Isaac.GetSoundIdByName("CCGdrown")
+if drown~=-1 then
+    mod:AddCallback(ModCallbacks.MC_POST_UPDATE,function ()
+        if curseFreeFrame>0 or hearCurseLevel<=0 then
+            musicManager:Enable()
+            sfxManager:Stop(drown)
+            return
+        end
+        if not sfxManager:IsPlaying(drown) then
+            sfxManager:Play(drown,8,2,true)
+        end
+        musicManager:Disable()
+    end)
+    mod:AddCallback(ModCallbacks.MC_PRE_SFX_PLAY,function (_,id)
+        if curseFreeFrame>0 or hearCurseLevel<=0 then
+            return
+        end
+        if id~=drown then
+            return false
+        end
+    end)
+    print("load drown success")
+end
+
 
 --- 更新各诅咒(包括黑蜡烛处理逻辑)(龙)
 local function blackCandleDecreaseCurse()
-    local stage=getStage()
-    local decreaseLevel=stage//2
+    local decreaseLevel=stageCount//2
     for _ = 1, decreaseLevel do
         local weightPool = {}
         local totalWeight = 0
@@ -462,26 +498,31 @@ local function blackCandleDecreaseCurse()
         end
     end
 end
-mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,function ()
-    local level=Game():GetLevel()
-    if clearCurse then
-        sandCurseLevel=0
-        drunkCurseLevel=0
-        hearCurseLevel=0
-        return
-    end
-    local stage=getStage()
-    sandCurseLevel=stage-1
-    drunkCurseLevel=stage//5
-    hearCurseLevel=stage>8 and 1 or 0
+local function updateCurse()
+    sandCurseLevel=stageCount-1
+    drunkCurseLevel=stageCount//5
+    hearCurseLevel=stageCount>8 and 1 or 0
     if Isaac.GetPlayer():HasCollectible(CollectibleType.COLLECTIBLE_BLACK_CANDLE) then
         blackCandleDecreaseCurse()
     end
+end
+mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL,function ()
+    if not CurseStopGrow then
+        stageCount=stageCount+1
+    end
+    updateCurse()
 end)
 mod:AddCallback(ModCallbacks.MC_POST_ADD_COLLECTIBLE,function (_,itemT,_,isF)
     if itemT==CollectibleType.COLLECTIBLE_BLACK_CANDLE and isF then
         blackCandleDecreaseCurse()
     end
+end)
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED,function (_,isC)
+    if isC then
+        return
+    end
+    stageCount=1
+    updateCurse()
 end)
 
 --- 获取特殊道具时特殊效果(龙)
@@ -492,11 +533,8 @@ mod:AddCallback(ModCallbacks.MC_POST_ADD_COLLECTIBLE,function (_,itemT,_,isF)
     if isF and config:IsCollectible() and (config:HasTags(ItemConfig.TAG_MOM) or config:HasTags(ItemConfig.TAG_BABY)) then
         curseFreeFrame=900
         glowingHourglassFrame=300
-        all_room_index={}
-        for key, _ in pairs(all_room_doors) do
-            table.insert(all_room_index,key)
-        end
-        glowingHourglassRoomInd=all_room_index[myRNG:RandomInt(#all_room_index)+1]
+        glowingHourglassRoomInd=Game():GetLevel():GetRandomRoomIndex(false,Game():GetRoom():GetSpawnSeed())
+        print(1431," ",glowingHourglassRoomInd)
         hasSpawnGlowingHourglass=false
     end
 end)
@@ -506,7 +544,9 @@ mod:AddCallback(ModCallbacks.MC_POST_UPDATE,function ()
     end
     if glowingHourglassFrame>0 then
         glowingHourglassFrame=glowingHourglassFrame-1
-        if Game():GetLevel():GetCurrentRoomDesc().SafeGridIndex==glowingHourglassRoomInd and not hasSpawnGlowingHourglass then
+        print(Game():GetLevel():GetCurrentRoomDesc().SafeGridIndex)
+        local level=Game():GetLevel()
+        if level:GetRoomByIdx(glowingHourglassRoomInd) and level:GetCurrentRoomDesc().SafeGridIndex==level:GetRoomByIdx(glowingHourglassRoomInd).SafeGridIndex and not hasSpawnGlowingHourglass then
             hasSpawnGlowingHourglass=true
             local pos = Isaac.GetRandomPosition()
             local room=Game():GetRoom()
@@ -514,3 +554,10 @@ mod:AddCallback(ModCallbacks.MC_POST_UPDATE,function ()
         end
     end
 end)
+
+---杀死母亲时掉落愚者卡
+mod:AddCallback(ModCallbacks.MC_POST_ENTITY_KILL,function (_,EntN)
+    if EntN.Variant==10 then
+        Game():Spawn(EntityType.ENTITY_PICKUP,PickupVariant.PICKUP_TAROTCARD,EntN.Position,Vector.Zero,nil,1,Game():GetSeeds():GetStartSeed())
+    end
+end,EntityType.ENTITY_MOM)
